@@ -85,32 +85,32 @@ slide.addText("* First item", { ... });  // Creates double bullets
 ## Shapes
 
 ```javascript
-slide.addShape(pres.shapes.RECTANGLE, {
+slide.addShape(pres.ShapeType.rect, {
   x: 0.5, y: 0.8, w: 1.5, h: 3.0,
   fill: { color: "FF0000" }, line: { color: "000000", width: 2 }
 });
 
-slide.addShape(pres.shapes.OVAL, { x: 4, y: 1, w: 2, h: 2, fill: { color: "0000FF" } });
+slide.addShape(pres.ShapeType.ellipse, { x: 4, y: 1, w: 2, h: 2, fill: { color: "0000FF" } });
 
-slide.addShape(pres.shapes.LINE, {
+slide.addShape(pres.ShapeType.line, {
   x: 1, y: 3, w: 5, h: 0, line: { color: "FF0000", width: 3, dashType: "dash" }
 });
 
 // With transparency
-slide.addShape(pres.shapes.RECTANGLE, {
+slide.addShape(pres.ShapeType.rect, {
   x: 1, y: 1, w: 3, h: 2,
   fill: { color: "0088CC", transparency: 50 }
 });
 
-// Rounded rectangle (rectRadius only works with ROUNDED_RECTANGLE, not RECTANGLE)
+// Rounded rectangle (rectRadius only works with ShapeType.roundRect, not ShapeType.rect)
 // Don't pair with rectangular accent overlays -- they won't cover rounded corners. Use RECTANGLE instead.
-slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+slide.addShape(pres.ShapeType.roundRect, {
   x: 1, y: 1, w: 3, h: 2,
   fill: { color: "FFFFFF" }, rectRadius: 0.1
 });
 
 // With shadow
-slide.addShape(pres.shapes.RECTANGLE, {
+slide.addShape(pres.ShapeType.rect, {
   x: 1, y: 1, w: 3, h: 2,
   fill: { color: "FFFFFF" },
   shadow: { type: "outer", color: "000000", blur: 6, offset: 2, angle: 135, opacity: 0.15 }
@@ -288,7 +288,7 @@ slide.addTable(tableData, { x: 1, y: 3.5, w: 8, colW: [4, 4] });
 
 ```javascript
 // Bar chart
-slide.addChart(pres.charts.BAR, [{
+slide.addChart(pres.ChartType.bar, [{
   name: "Sales", labels: ["Q1", "Q2", "Q3", "Q4"], values: [4500, 5500, 6200, 7100]
 }], {
   x: 0.5, y: 0.6, w: 6, h: 3, barDir: 'col',
@@ -296,12 +296,12 @@ slide.addChart(pres.charts.BAR, [{
 });
 
 // Line chart
-slide.addChart(pres.charts.LINE, [{
+slide.addChart(pres.ChartType.line, [{
   name: "Temp", labels: ["Jan", "Feb", "Mar"], values: [32, 35, 42]
 }], { x: 0.5, y: 4, w: 6, h: 3, lineSize: 3, lineSmooth: true });
 
 // Pie chart
-slide.addChart(pres.charts.PIE, [{
+slide.addChart(pres.ChartType.pie, [{
   name: "Share", labels: ["A", "B", "Other"], values: [35, 45, 20]
 }], { x: 7, y: 1, w: 5, h: 4, showPercent: true });
 ```
@@ -344,12 +344,12 @@ These issues cause file corruption, visual bugs, or broken output. Avoid them.
 8. **Don't use `ROUNDED_RECTANGLE` with accent borders** — rectangular overlay bars won't cover rounded corners. Use `RECTANGLE` instead.
    ```javascript
    // WRONG: Accent bar doesn't cover rounded corners
-   slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 1, y: 1, w: 3, h: 1.5, fill: { color: "FFFFFF" } });
-   slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 0.08, h: 1.5, fill: { color: "0891B2" } });
+   slide.addShape(pres.ShapeType.roundRect, { x: 1, y: 1, w: 3, h: 1.5, fill: { color: "FFFFFF" } });
+   slide.addShape(pres.ShapeType.rect, { x: 1, y: 1, w: 0.08, h: 1.5, fill: { color: "0891B2" } });
 
    // CORRECT: Use RECTANGLE for clean alignment
-   slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 3, h: 1.5, fill: { color: "FFFFFF" } });
-   slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 0.08, h: 1.5, fill: { color: "0891B2" } });
+   slide.addShape(pres.ShapeType.rect, { x: 1, y: 1, w: 3, h: 1.5, fill: { color: "FFFFFF" } });
+   slide.addShape(pres.ShapeType.rect, { x: 1, y: 1, w: 0.08, h: 1.5, fill: { color: "0891B2" } });
    ```
 
 ---

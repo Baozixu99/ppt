@@ -1,7 +1,6 @@
 {
-  "name": "PPT 演示文稿",
-  "installedAt": 1783224135468,
+  "name": "pptx-generator",
   "source": "marketplace",
   "iconSource": "pptx-generator",
-  "version": "1.1.0"
+  "version": "2.0.0"
 }

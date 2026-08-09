@@ -138,11 +138,11 @@ For tinted overlays, borders, and hover states, use the `opacity` property (0.0-
 
 ```javascript
 // Correct: Using palette colors
-slide.addShape(pres.shapes.RECTANGLE, { fill: { color: theme.primary } });
+slide.addShape(pres.ShapeType.rect, { fill: { color: theme.primary } });
 slide.addText('Title', { color: theme.accent });
 
 // Wrong: Colors outside palette
-slide.addShape(pres.shapes.RECTANGLE, { fill: { color: '1a1a2e' } });
+slide.addShape(pres.ShapeType.rect, { fill: { color: '1a1a2e' } });
 ```
 
 ### No Gradients
@@ -166,74 +166,24 @@ slide.addShape(pres.shapes.RECTANGLE, { fill: { color: '1a1a2e' } });
 - Prefer system fonts for cross-platform compatibility
 - Titles and body text can use different font pairings (e.g. Georgia + Calibri)
 
-### Font Fallback Chain (Cross-Platform - MANDATORY for any user who isn't on Windows)
+### Cross-Platform Font Selection
 
-> **Without a fallback chain, your Chinese characters render as garbled boxes on macOS / Linux** where `Microsoft YaHei` is not installed. This is a top-3 cause of "my slides look broken on the reviewer's Mac".
+`fontFace` accepts one PowerPoint font name. Do not pass a CSS-style comma-separated list: PptxGenJS stores that entire list as one typeface string instead of evaluating it as a fallback chain.
 
-#### The single recommended chain
-
-```javascript
-// PptxGenJS uses CSS-style comma-separated fontFace strings.
-// The chain covers Windows, macOS, Linux, and falls back to any CJK font.
-const FONT_CN = 'Microsoft YaHei, PingFang SC, Hiragino Sans GB, Noto Sans CJK SC, sans-serif';
-const FONT_EN = 'Arial, Helvetica, sans-serif';
-const FONT_MONO = 'Consolas, Menlo, Monaco, monospace';  // for code listings
-```
-
-| Position | Font | Available on |
-|----------|------|--------------|
-| 1 | **Microsoft YaHei** | Windows (default Chinese) |
-| 2 | **PingFang SC** | macOS (default Chinese since 10.11) |
-| 3 | **Hiragino Sans GB** | macOS (older fallback) |
-| 4 | **Noto Sans CJK SC** | Linux (most distros with `noto-fonts-cjk` package) |
-| 5 | **sans-serif** | Universal fallback |
-
-#### Where to declare this
-
-Define it once in `slides/_helpers.js` (see [build-config.md](build-config.md)):
+Select one real font for the build platform and allow an explicit environment override:
 
 ```javascript
-const FONT_CN = 'Microsoft YaHei, PingFang SC, Hiragino Sans GB, Noto Sans CJK SC, sans-serif';
-const FONT_EN = 'Arial, Helvetica, sans-serif';
-
-module.exports = { /* helpers */, FONT_CN, FONT_EN };
+function platformFonts() {
+  if (process.env.PPTX_FONT_CN) {
+    return { cn: process.env.PPTX_FONT_CN, en: process.env.PPTX_FONT_EN || 'Arial' };
+  }
+  if (process.platform === 'darwin') return { cn: 'PingFang SC', en: 'Helvetica' };
+  if (process.platform === 'win32') return { cn: 'Microsoft YaHei', en: 'Arial' };
+  return { cn: 'Noto Sans CJK SC', en: 'DejaVu Sans' };
+}
 ```
 
-Then in every slide:
-
-```javascript
-const { pageBadge, FONT_CN } = require('./_helpers.js');
-
-slide.addText('Chinese title', {
-  fontFace: FONT_CN,    // uses fallback chain
-  // NOT fontFace: 'Microsoft YaHei'   // breaks on macOS / Linux
-});
-```
-
-#### What "broken" looks like (symptom)
-
-If your deck is opened on a machine without Microsoft YaHei:
-
-- Chinese characters render as small rectangles (tofu) `[][][][]`
-- Or as fallback font that's much thinner than the English text - looks visually inconsistent
-- PptxGenJS itself does NOT substitute fonts at runtime - the fontFace string is stored as-is in the XML
-
-#### Verifying the chain works
-
-After `npm run build`, open the PPTX in PowerPoint on Windows, then open the same file in Keynote on macOS (or LibreOffice on Linux). Both should render Chinese identically.
-
-If you only have Windows and need to test the fallback chain without a Mac:
-
-```bash
-unzip -o output/presentation.pptx -d debug/
-grep -o 'typeface="[^"]*"' debug/ppt/slides/slide1.xml | sort -u
-```
-
-You should see your full chain, e.g. `typeface="Microsoft YaHei, PingFang SC, Hiragino Sans GB, Noto Sans CJK SC, sans-serif"`.
-
-#### Alternative: ship fonts with the deck
-
-For mission-critical presentations, you can embed the font files using PowerPoint's "Embed fonts in the file" option - but this requires PowerPoint (not PptxGenJS). Recommended only when you can't trust the reviewer's environment.
+The starter deck defines this once in `_helpers.js`. Before a high-stakes delivery, render on the target platform or use a known installed font such as Noto Sans CJK across all build environments. PowerPoint font embedding requires a separate Office-based step and appropriate font licensing.
 
 ### Recommended Font Pairings
 
@@ -352,22 +302,21 @@ The same design can be rendered in 4 distinct visual styles by adjusting corner 
 #### PptxGenJS Corner Radius Examples
 
 ```javascript
-// Sharp style card
-slide.addShape("rect", {
+// Sharp style card: use a plain rectangle when no rounding is desired.
+slide.addShape(pres.ShapeType.rect, {
   x: 0.5, y: 1, w: 4, h: 2.5,
-  fill: { color: "F5F5F5" },
-  rectRadius: 0.03
+  fill: { color: "F5F5F5" }
 });
 
-// Rounded style card
-slide.addShape("rect", {
+// Rounded style card: rectRadius only works with roundRect.
+slide.addShape(pres.ShapeType.roundRect, {
   x: 0.5, y: 1, w: 4, h: 2.5,
   fill: { color: "F5F5F5" },
   rectRadius: 0.2
 });
 
 // Pill style button (height 0.4", rectRadius 0.2" = perfect pill)
-slide.addShape("rect", {
+slide.addShape(pres.ShapeType.roundRect, {
   x: 3, y: 4, w: 2, h: 0.4,
   fill: { color: "4A90D9" },
   rectRadius: 0.2
@@ -412,10 +361,10 @@ button: rectRadius: 0.2
 | Usage | Size (pt) | Notes |
 |-------|-----------|-------|
 | Annotations / Sources | 10 ~ 12 | Minimum readable size |
-| Body / Description | 14 ~ 16 | Standard body |
-| Subtitle | 18 ~ 22 | Secondary heading |
-| Title | 28 ~ 36 | Page title |
-| Large Title | 44 ~ 60 | Cover / section title |
+| Body / Description | 16 ~ 20 | Standard body; 16pt minimum without a template override |
+| Subtitle | 24 ~ 28 | Secondary heading |
+| Title | 35 ~ 44 | Page title |
+| Large Title | 50 ~ 64 | Cover / section title |
 | Data Callout | 60 ~ 96 | Key number display |
 
 ### Spacing Scale (PPT)
@@ -449,7 +398,7 @@ Default PptxGenJS charts look dated. Apply this recipe for a modern, clean appea
 ### Reference Pattern
 
 ```javascript
-slide.addChart(pres.charts.BAR, chartData, {
+slide.addChart(pres.ChartType.bar, chartData, {
   x: 0.5, y: 1, w: 9, h: 4, barDir: "col",
 
   // Custom colors (match your presentation palette)

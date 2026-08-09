@@ -118,7 +118,7 @@ This table itself becomes a navigation aid for the committee.
 | 3 | **主标题** | 破折号引导的中英文并列长标题（"——基于 FG-WRR 与闭环反馈的自适应 QoS 调度机制"），黑色加粗，字号 ≈ 24pt |
 | 4 | **校徽 Logo** | 右上角，**圆形校徽 + 中文校名 + 英文校名** 三行垂直版式，圆直径 ≈ 0.6" |
 | 5 | **Header 总高** | 占整页高度的 1/8（约 0.7"），与正文区分隔 |
-| 6 | **Divider** | Header 下方 0.05" 厚的横线（用 `pres.shapes.LINE`，height=0） |
+| 6 | **Divider** | Header 下方 0.05" 厚的横线（用 `pres.ShapeType.line`，height=0） |
 | 7 | **Divider 颜色与粗细** | 与编号同色（`theme.primary`），`width: 2`（pt） |
 
 ### Layout Skeleton
@@ -177,7 +177,7 @@ function createAcademicHeader(slide, pres, theme, opts) {
   });
 
   // 4. 校徽（圆形 + 中文 + 英文三行）
-  slide.addShape(pres.shapes.OVAL, {
+  slide.addShape(pres.ShapeType.ellipse, {
     x: 9.0, y: HEADER_Y, w: 0.6, h: 0.6,
     fill: { color: theme.accent },
     line: { color: theme.primary, width: 1 }
@@ -191,7 +191,7 @@ function createAcademicHeader(slide, pres, theme, opts) {
   });
 
   // 6-7. Divider
-  slide.addShape(pres.shapes.LINE, {
+  slide.addShape(pres.ShapeType.line, {
     x: 0.5, y: 1.05, w: 9.0, h: 0,
     line: { color: theme.primary, width: 2 }
   });

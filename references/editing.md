@@ -1,169 +1,89 @@
 # Editing Existing Presentations
 
-## Template-Based Workflow
+Treat the source deck as both content and visual authority. Preserve the original file, master/layout hierarchy, placeholders, relationships, notes, charts, and media wherever possible.
 
-When using an existing presentation as a template:
+## Required workflow
 
-1. **Copy and analyze**:
-   ```bash
-   cp /path/to/user-provided.pptx template.pptx
-   python -m markitdown template.pptx > template.md
-   ```
-   Review `template.md` to see placeholder text and slide structure.
+### 1. Preserve and inspect
 
-2. **Plan slide mapping**: For each content section, choose a template slide.
+- Copy the source to a task workspace. Never edit the user's original in place.
+- Extract text for content orientation.
+- Render every source slide and inspect it individually.
+- Inventory masters, layouts, placeholders, notes, charts, images, embedded objects, and repeated elements.
 
-   **USE VARIED LAYOUTS** — monotonous presentations are a common failure mode. Don't default to basic title + bullet slides. Actively seek out:
-   - Multi-column layouts (2-column, 3-column)
-   - Image + text combinations
-   - Full-bleed images with text overlay
-   - Quote or callout slides
-   - Section dividers
-   - Stat/number callouts
-   - Icon grids or icon + text rows
+Text extraction alone cannot reveal layout, cropping, hierarchy, or visual quality.
 
-   **Avoid:** Repeating the same text-heavy layout for every slide.
+### 2. Map content to source layouts
 
-   Match content type to layout style (e.g., key points -> bullet slide, team info -> multi-column, testimonials -> quote slide).
+For every requested slide, record:
 
-3. **Unpack**: Extract the PPTX into an editable XML tree using Python's `zipfile` module. Pretty-print the XML for readability.
+- Source slide or source layout to reuse.
+- Placeholders and elements to replace.
+- Elements to preserve.
+- Content-length and aspect-ratio constraints.
 
-4. **Build presentation** (do this yourself, not with subagents):
-   - Delete unwanted slides (remove from `<p:sldIdLst>`)
-   - Duplicate slides you want to reuse (copy slide XML, relationships, and update `Content_Types.xml` and `presentation.xml`)
-   - Reorder slides in `<p:sldIdLst>`
-   - **Complete all structural changes before step 5**
+Prefer editing inherited placeholders over flattening the slide or rebuilding it from scratch. Do not mix a user template with an unrelated default visual system.
 
-5. **Edit content**: Update text in each `slide{N}.xml`.
-   **Use subagents here if available** — slides are separate XML files, so subagents can edit in parallel.
+### 3. Select the safest editing path
 
-6. **Clean**: Remove orphaned files — slides not in `<p:sldIdLst>`, unreferenced media, orphaned rels.
-
-7. **Pack**: Repack the XML tree into a PPTX file. Validate, repair, condense XML, re-encode smart quotes.
-
-   Always write to a **platform-safe temp path** first (Python's `tempfile` module uses `os.tmpdir()`, which resolves to `/tmp` on Linux/macOS and `%TEMP%` on Windows), then copy to the final path. Writing to a hard-coded `/tmp/` fails on Windows; bind-mounted volumes (e.g. Docker) also break `zipfile.seek()`. The portable pattern is:
-
-   ```python
-   import tempfile, os, shutil
-   tmp_path = os.path.join(tempfile.gettempdir(), "edited.pptx")
-   # ... write to tmp_path ...
-   shutil.copy(tmp_path, final_path)
-   ```
-
-## Output Structure
-
-Copy the user-provided file to `template.pptx` in cwd. This preserves the original and gives a predictable name for all downstream operations.
+1. Use a presentation library or Office automation that preserves the required objects when available.
+2. Use OOXML only when the higher-level path cannot perform the edit.
+3. For OOXML work, use the bundled unpack, pack, and validation scripts. Do not extract and rezip with ad-hoc commands.
 
 ```bash
-cp /path/to/user-provided.pptx template.pptx
+python scripts/unpack-pptx.py template.pptx workspace/unpacked
+python scripts/pack-pptx.py workspace/unpacked output/edited.pptx
+python scripts/validate-pptx.py output/edited.pptx
 ```
+
+### 4. Complete structural changes first
+
+Finish slide duplication, deletion, order, layout assignment, and relationship updates before replacing slide text. A copied slide may depend on:
+
+- Slide relationships.
+- Notes and notes-master relationships.
+- Charts and embedded workbooks.
+- Media files.
+- Layout and master parts.
+- `[Content_Types].xml` overrides.
+- `ppt/presentation.xml` and its relationships.
+
+Never copy only `slideN.xml`.
+
+### 5. Replace complete content groups
+
+- Replace every placeholder in the chosen source composition.
+- If the source has fewer items than the template, remove the entire unused group rather than clearing only its text.
+- Preserve paragraph structure, bullets, runs, language attributes, and inherited formatting.
+- Prefer shorter copy or another source layout when replacement text does not fit.
+- Preserve `xml:space="preserve"` for leading or trailing spaces.
+- Use proper OOXML bullets instead of Unicode bullet characters.
+
+### 6. Validate structure
+
+Run `validate-pptx.py` after every structural edit batch. It checks ZIP integrity, required package parts, XML parsing, and internal relationship targets.
+
+Structural validation is necessary but not sufficient: a structurally valid deck may still be visually wrong.
+
+### 7. Render and compare
+
+- Render every edited slide.
+- Compare edited slides with their source layouts at full size.
+- Check wrapping, clipping, alignment, image crops, chart labels, page markers, footers, and orphaned elements.
+- Reopen the final file in PowerPoint, Keynote, or LibreOffice when available.
+
+## Output contract
 
 ```text
-./
-├── template.pptx               # Copy of user-provided file (never modified)
-├── template.md                 # markitdown extraction
-├── unpacked/                   # Editable XML tree
-└── edited.pptx                 # Final repacked deck
+workspace/
+├── source.pptx
+├── source-rendered/
+├── unpacked/
+└── source-notes.txt
+output/
+├── edited.pptx
+├── rendered/
+└── montage.png
 ```
 
-Minimum expected deliverable: `edited.pptx`.
-
-## Slide Operations
-
-Slide order is in `ppt/presentation.xml` -> `<p:sldIdLst>`.
-
-**Reorder**: Rearrange `<p:sldId>` elements.
-
-**Delete**: Remove `<p:sldId>`, then clean orphaned files.
-
-**Add**: Copy the source slide's XML file, its `.rels` file, and update `Content_Types.xml` and `presentation.xml`. Never manually copy slide files without updating all references — this causes broken notes references and missing relationship IDs.
-
-## Editing Content
-
-**Subagents:** If available, use them here (after completing step 4). Each slide is a separate XML file, so subagents can edit in parallel. In your prompt to subagents, include:
-- The slide file path(s) to edit
-- **"Use the Edit tool for all changes"**
-- The formatting rules and common pitfalls below
-
-For each slide:
-1. Read the slide's XML
-2. Identify ALL placeholder content — text, images, charts, icons, captions
-3. Replace each placeholder with final content
-
-**Use the Edit tool, not sed or Python scripts.** The Edit tool forces specificity about what to replace and where, yielding better reliability.
-
-## Formatting Rules
-
-- **Bold all headers, subheadings, and inline labels**: Use `b="1"` on `<a:rPr>`. This includes:
-  - Slide titles
-  - Section headers within a slide
-  - Inline labels like (e.g.: "Status:", "Description:") at the start of a line
-- **Never use unicode bullets**: Use proper list formatting with `<a:buChar>` or `<a:buAutoNum>`
-- **Bullet consistency**: Let bullets inherit from the layout. Only specify `<a:buChar>` or `<a:buNone>`.
-
-## Common Pitfalls — Template Editing
-
-### Template Adaptation
-
-When source content has fewer items than the template:
-- **Remove excess elements entirely** (images, shapes, text boxes), don't just clear text
-- Check for orphaned visuals after clearing text content
-- Run content QA with `markitdown` to catch mismatched counts
-
-When replacing text with different length content:
-- **Shorter replacements**: Usually safe
-- **Longer replacements**: May overflow or wrap unexpectedly
-- Verify with `markitdown` after text changes
-- Consider truncating or splitting content to fit the template's design constraints
-
-**Template slots != Source items**: If template has 4 team members but source has 3 users, delete the 4th member's entire group (image + text boxes), not just the text.
-
-### Multi-Item Content
-
-If source has multiple items (numbered lists, multiple sections), create separate `<a:p>` elements for each — **never concatenate into one string**.
-
-**WRONG** — all items in one paragraph:
-```xml
-<a:p>
-  <a:r><a:rPr .../><a:t>Step 1: Do the first thing. Step 2: Do the second thing.</a:t></a:r>
-</a:p>
-```
-
-**CORRECT** — separate paragraphs with bold headers:
-```xml
-<a:p>
-  <a:pPr algn="l"><a:lnSpc><a:spcPts val="3919"/></a:lnSpc></a:pPr>
-  <a:r><a:rPr lang="en-US" sz="2799" b="1" .../><a:t>Step 1</a:t></a:r>
-</a:p>
-<a:p>
-  <a:pPr algn="l"><a:lnSpc><a:spcPts val="3919"/></a:lnSpc></a:pPr>
-  <a:r><a:rPr lang="en-US" sz="2799" .../><a:t>Do the first thing.</a:t></a:r>
-</a:p>
-<a:p>
-  <a:pPr algn="l"><a:lnSpc><a:spcPts val="3919"/></a:lnSpc></a:pPr>
-  <a:r><a:rPr lang="en-US" sz="2799" b="1" .../><a:t>Step 2</a:t></a:r>
-</a:p>
-<!-- continue pattern -->
-```
-
-Copy `<a:pPr>` from the original paragraph to preserve line spacing. Use `b="1"` on headers.
-
-### Smart Quotes
-
-The Edit tool converts smart quotes to ASCII. **When adding new text with quotes, use XML entities:**
-
-```xml
-<a:t>the &#x201C;Agreement&#x201D;</a:t>
-```
-
-| Character | Name | Unicode | XML Entity |
-|-----------|------|---------|------------|
-| \u201c | Left double quote | U+201C | `&#x201C;` |
-| \u201d | Right double quote | U+201D | `&#x201D;` |
-| \u2018 | Left single quote | U+2018 | `&#x2018;` |
-| \u2019 | Right single quote | U+2019 | `&#x2019;` |
-
-### Other
-
-- **Whitespace**: Use `xml:space="preserve"` on `<a:t>` with leading/trailing spaces
-- **XML parsing**: Use `defusedxml.minidom`, not `xml.etree.ElementTree` (corrupts namespaces)
+Deliver `edited.pptx`; keep the source unchanged. Do not deliver the unpacked OOXML tree unless requested.

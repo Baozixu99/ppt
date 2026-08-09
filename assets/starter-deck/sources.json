@@ -1,0 +1,10 @@
+{
+  "sources": [
+    {
+      "id": "starter-fixture",
+      "kind": "internal",
+      "title": "pptx-generator starter smoke fixture",
+      "usage": "Validates source-manifest and speaker-note wiring"
+    }
+  ]
+}

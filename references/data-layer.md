@@ -8,7 +8,7 @@ Without a data layer, chart values get hardcoded inside `slide-22.js`, `slide-23
 
 ```javascript
 // slide-22.js — numbers buried in view code
-slide.addChart(pres.charts.BAR, [
+slide.addChart(pres.ChartType.bar, [
   { name: 'P50', labels: ['MMIO Doorbell', 'ioctl Syscall'], values: [5.12, 8.56] },
   { name: 'P99', labels: ['MMIO Doorbell', 'ioctl Syscall'], values: [5.28, 8.94] }
 ], { ... });
@@ -88,7 +88,7 @@ function createSlide(pres, theme) {
   // ... header ...
 
   // Chart references the data file, NOT a hardcoded array
-  slide.addChart(pres.charts.BAR, [
+  slide.addChart(pres.ChartType.bar, [
     { name: 'P50', labels: Object.keys(stats.interrupt.p50), values: Object.values(stats.interrupt.p50) },
     { name: 'P99', labels: Object.keys(stats.interrupt.p99), values: Object.values(stats.interrupt.p99) }
   ], { /* layout options */ });
@@ -157,5 +157,5 @@ This way the data file is a flat fact sheet, easy to audit.
 ## Cross-References
 
 - Chart data shapes: see [chart-schemas.md](chart-schemas.md)
-- Slide boilerplate (pageBadge, academicHeader): see [build-config.md](build-config.md#slides_helpersjs-shared-reusable-components)
+- Slide boilerplate and shared helpers: see [build-config.md](build-config.md#shared-helpers)
 - Academic Header (which uses section numbers that may map to data sections): see [academic-patterns.md → §Section Number Mapping](academic-patterns.md#section-number-mapping-convention)

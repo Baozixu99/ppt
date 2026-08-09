@@ -1,0 +1,18 @@
+{
+  "name": "pptx-generator-deck",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "node compile.js",
+    "qa": "node qa.js",
+    "verify": "npm run build && npm run qa"
+  },
+  "dependencies": {
+    "jszip": "3.10.1",
+    "pptxgenjs": "4.0.1"
+  }
+}

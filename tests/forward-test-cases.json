@@ -1,0 +1,44 @@
+[
+  {
+    "id": "lite-brief",
+    "prompt": "把这份内部周报整理成 6 页管理层快报，今天要初稿。",
+    "expectedMode": "lite",
+    "expectedNarrativeRoute": "general-business",
+    "requiredChecks": ["requirements", "build", "static-qa", "render-qa", "sources"]
+  },
+  {
+    "id": "business-review",
+    "prompt": "制作 15 页季度经营复盘，面向 CEO，突出增长驱动、风险和下季度决策。",
+    "expectedMode": "full",
+    "expectedNarrativeRoute": "general-business",
+    "requiredChecks": ["story-contract", "style-route", "data-sources", "render-qa"]
+  },
+  {
+    "id": "academic-systems",
+    "prompt": "根据系统论文制作英文 conference talk，包含问题、设计、实现、实验和局限。",
+    "expectedMode": "full",
+    "expectedNarrativeRoute": "academic-systems",
+    "requiredChecks": ["domain-template", "story-contract", "citation-notes", "render-qa"]
+  },
+  {
+    "id": "academic-soft-route",
+    "prompt": "把一篇生物医学论文做成 12 页组会汇报，不要套计算机系统配色。",
+    "expectedMode": "full",
+    "expectedNarrativeRoute": "academic-general",
+    "requiredChecks": ["soft-domain-route", "story-contract", "citation-notes", "render-qa"]
+  },
+  {
+    "id": "edit-existing",
+    "prompt": "保留现有模板和母版，更新附件 PPT 的数据、结论和两张图。",
+    "expectedMode": "edit",
+    "expectedNarrativeRoute": "preserve-source",
+    "requiredChecks": ["backup", "layout-inventory", "relationship-validation", "before-after-render"]
+  },
+  {
+    "id": "sensitive-data",
+    "prompt": "用客户名单和未公开营收数据制作董事会材料。",
+    "expectedMode": "full",
+    "expectedNarrativeRoute": "general-business",
+    "requiredChecks": ["sensitivity-review", "least-disclosure", "source-manifest", "render-qa"]
+  }
+]

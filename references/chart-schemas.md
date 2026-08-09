@@ -2,9 +2,9 @@
 
 PptxGenJS supports 7 chart types. This file defines the **data conventions** for charts embedded in slide JS files.
 
-## In-Slide Convention (RECOMMENDED)
+## Choose Inline or `_data/`
 
-The recommended pattern: pass chart data **directly inline** in the slide JS file. Do NOT require separate JSON files unless the user provides structured data.
+Use inline data for a small one-off chart that appears on only one slide. Use `slides/_data/` when data is user-provided, reused, large, transformed, or expected to change independently of layout.
 
 ```javascript
 // Inline chart data — most common case
@@ -14,7 +14,7 @@ const chartData = [{
   values: [120, 145, 168, 192]
 }];
 
-slide.addChart(pres.charts.BAR, chartData, {
+slide.addChart(pres.ChartType.bar, chartData, {
   x: 0.5, y: 1.5, w: 9, h: 3.5,
   showTitle: true,
   title: "Quarterly Revenue",
@@ -35,7 +35,7 @@ Only when the user provides structured data files (CSV, JSON) or asks for a recu
 
 ```
 slides/
-  data/
+  _data/
     chart-01-revenue.json   // user-provided or recurring
   slide-XX.js
 ```
@@ -45,7 +45,7 @@ const fs = require("fs");
 const path = require("path");
 
 function loadChartData(file) {
-  const p = path.join(__dirname, "data", file);
+  const p = path.join(__dirname, "_data", file);
   if (!fs.existsSync(p)) throw new Error("Chart data not found: " + file);
   return JSON.parse(fs.readFileSync(p, "utf-8"));
 }
@@ -79,10 +79,10 @@ For multi-series charts, `values` becomes an array of `{name, values, color}` ob
 
 | Type | Use Case | PptxGenJS API |
 |------|----------|---------------|
-| `BAR` | Compare categories | `pres.charts.BAR` with `barDir: "col"` or `"bar"` |
-| `LINE` | Trend over time | `pres.charts.LINE` with `lineDataSymbol: "circle"` |
-| `PIE` | Part-of-whole | `pres.charts.PIE` with `showPercent: true` |
-| `DOUGHNUT` | Part-of-whole (modern) | `pres.charts.DOUGHNUT` with `holeSize: 60` |
+| `BAR` | Compare categories | `pres.ChartType.bar` with `barDir: "col"` or `"bar"` |
+| `LINE` | Trend over time | `pres.ChartType.line` with `lineDataSymbol: "circle"` |
+| `PIE` | Part-of-whole | `pres.ChartType.pie` with `showPercent: true` |
+| `DOUGHNUT` | Part-of-whole (modern) | `pres.ChartType.doughnut` with `holeSize: 60` |
 | `SCATTER` | Correlation (x, y) | values as `[{x, y}, ...]` |
 | `BUBBLE` | 3-dim (x, y, size) | values as `[{x, y, size}, ...]` |
 | `RADAR` | Multi-attribute comparison | Multiple series with shared labels |

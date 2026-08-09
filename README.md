@@ -1,65 +1,58 @@
-# PPT 演示文稿 Skill
+# pptx-generator
 
-Cursor IDE 的 PPTX 生成与编辑 Skill。覆盖从零生成、模板编辑、参考图风格分析、PptxGenJS 最佳实践。
+A lightweight Agent Skill for creating, editing, analyzing, and visually verifying editable PowerPoint presentations with PptxGenJS.
 
-## Features
+## What it adds
 
-- 2 modes: Learn-from-reference / Create-from-scratch
-- 12 reference files + 1 domain template
-- Academic-paper template (OS / Virtualization / Real-time Systems)
-- 6-item QA checklist (Windows encoding traps, PptxGenJS anti-patterns, sensitive-info detection)
-- Graceful degradation in compile.js
+- Full and lite workflows with explicit escape conditions.
+- STORY-based narrative planning for complex decks.
+- Separate narrative and visual routing.
+- A reusable starter deck instead of regenerated build boilerplate.
+- Static QA plus mandatory render-based visual QA.
+- Academic systems-paper patterns, data/source separation, and sensitive-information handling.
 
 ## Install
 
-Copy this folder to your Cursor skills directory:
+Copy the `pptx-generator` folder to a supported Agent Skills location:
 
-- Windows: `C:\Users\<you>\.cursor\skills\PPT 演示文稿\`
-- macOS: `~/.cursor/skills/PPT 演示文稿/`
-- Linux: `~/.cursor/skills/PPT 演示文稿/`
+- WorkBuddy: `~/.workbuddy/skills/pptx-generator/`
+- Cursor: `~/.cursor/skills/pptx-generator/`
+- Other clients: use the client's Agent Skills directory.
 
-Restart Cursor or refresh the Skills panel.
+The installed directory name must remain `pptx-generator` so it matches the `name` field in `SKILL.md`.
 
-## Usage
+## Repository structure
 
-In Cursor, send:
-
+```text
+pptx-generator/
+├── SKILL.md
+├── assets/
+│   └── starter-deck/
+├── scripts/
+├── references/
+│   └── domain-templates/
+├── tests/
+│   └── forward-test-cases.json
+└── README.md
 ```
-/PPT 演示文稿 帮我做一个关于 X 的 PPT
+
+The forward cases cover lite briefs, business reviews, academic decks, existing-deck edits, and sensitive-data handling. They are evaluation fixtures, not golden visual outputs.
+
+## Quick smoke test
+
+```bash
+node scripts/scaffold-deck.js tmp-deck
+cd tmp-deck
+npm install
+npm run build
+npm run qa
 ```
 
-or
-
-```
-/PPT 演示文稿 参考这张 PPT 学习它的配色和布局
-```
-
-## Structure
-
-```
-SKILL.md                       main entry
-_skillhub_meta.json            install metadata
-references/
-  academic-patterns.md         academic layouts
-  build-config.md              package.json + compile.js
-  chart-schemas.md             chart data schemas
-  data-layer.md                data-view separation
-  design-analysis.md           10-dim design analysis
-  design-system.md             color + font + style recipes
-  editing.md                   editing workflow
-  pitfalls.md                  6-item QA + Windows disasters
-  pptxgenjs.md                 PptxGenJS API
-  resources.md                 resource priority
-  sensitive-info.md            PII / HR / financial detection
-  slide-types.md               5 slide types
-  troubleshooting.md           troubleshooting
-domain-templates/
-  academic-os-systems.md       OS / virtualization template
-```
+For visual QA, run `scripts/render-slides.py` with installed Microsoft PowerPoint on Windows or LibreOffice on other platforms, then run `scripts/qa-render.py` and inspect the generated montage.
 
 ## License
 
-GPL (per source paper).
+Released under the [MIT License](LICENSE).
 
 ## Maintainer
 

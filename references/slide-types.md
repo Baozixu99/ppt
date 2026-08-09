@@ -61,7 +61,7 @@ Consider: Purpose (corporate/educational/creative), Audience, Tone, Content Volu
 1. **Analyze**: Understand topic, audience, purpose
 2. **Choose Layout**: Select based on content
 3. **Write Slide**: Use PptxGenJS. Use shapes and SVG elements for visual interest.
-4. **Verify**: Generate preview as `slide-XX-preview.pptx`. Extract text with `python -m markitdown slide-XX-preview.pptx`, verify all content present and no placeholder text remains.
+4. **Verify**: Build the deck, run `npm run qa`, then inspect the rendered slide for complete content, placeholders, clipping, and overlap.
 
 ---
 
@@ -145,7 +145,7 @@ Consider: Purpose (corporate/educational/creative), Audience, Tone, Content Volu
 2. **Choose Layout**: Based on section count and content
 3. **Plan Visual Hierarchy**: Numbering style, font sizes, spacing
 4. **Write Slide**: Use PptxGenJS. Use shapes for decorative elements. **MUST include page number badge.**
-5. **Verify**: Generate preview, extract text with markitdown, verify content and badge.
+5. **Verify**: Run static QA, then inspect the rendered slide for complete content and the required page badge.
 
 ---
 
@@ -315,7 +315,7 @@ Pick a subtype based on the content. Each content slide belongs to exactly ONE s
 1. **Analyze**: Content, determine subtype, plan layout
 2. **Choose Layout**: Best fit for subtype and content volume
 3. **Write Slide**: Use PptxGenJS. Use shapes for charts, decorative elements, icons. **MUST include page number badge.**
-4. **Verify**: Generate preview as `slide-XX-preview.pptx`. Extract text with markitdown, verify all content present, no placeholder text, badge included.
+4. **Verify**: Run static QA, then inspect the rendered slide for complete content, no placeholders, and the required page badge.
 
 ---
 
@@ -473,7 +473,7 @@ function createTimeline(slide, pres, theme, steps) {
 
     // Connector line (skip first)
     if (i > 0) {
-      slide.addShape(pres.shapes.LINE, {
+      slide.addShape(pres.ShapeType.line, {
         x: startX + stepWidth * (i - 1) + stepWidth / 2 + 0.3,
         y: yCenter,
         w: stepWidth - 0.6, h: 0,
@@ -482,7 +482,7 @@ function createTimeline(slide, pres, theme, steps) {
     }
 
     // Numbered circle marker
-    slide.addShape(pres.shapes.OVAL, {
+    slide.addShape(pres.ShapeType.ellipse, {
       x, y: yCenter - 0.3, w: 0.6, h: 0.6,
       fill: { color: theme.accent },
       line: { color: "FFFFFF", width: 2 }
@@ -581,7 +581,7 @@ function createComparison(slide, pres, theme, left, right) {
   const colY = 1.5;
 
   // Left card
-  slide.addShape(pres.shapes.RECTANGLE, {
+  slide.addShape(pres.ShapeType.roundRect, {
     x: leftX, y: colY, w: colWidth, h: 3.2,
     fill: { color: theme.bg },
     line: { color: theme.primary, width: 2 },
@@ -595,7 +595,7 @@ function createComparison(slide, pres, theme, left, right) {
   // ... add left bullets ...
 
   // Right card
-  slide.addShape(pres.shapes.RECTANGLE, {
+  slide.addShape(pres.ShapeType.roundRect, {
     x: rightX, y: colY, w: colWidth, h: 3.2,
     fill: { color: theme.bg },
     line: { color: theme.secondary, width: 2 },
@@ -604,7 +604,7 @@ function createComparison(slide, pres, theme, left, right) {
   // ... mirror structure ...
 
   // VS separator
-  slide.addShape(pres.shapes.OVAL, {
+  slide.addShape(pres.ShapeType.ellipse, {
     x: 4.85, y: 2.9, w: 0.3, h: 0.3,
     fill: { color: theme.accent }
   });

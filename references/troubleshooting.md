@@ -46,7 +46,7 @@ If still corrupted, try opening in LibreOffice — it often gives clearer error 
 
 - Use absolute path: `path.join(__dirname, "imgs", "hero.jpg")`
 - Verify file exists: `fs.existsSync(absPath)` before calling `addImage`
-- Image format must be JPG, PNG, GIF. **SVG is NOT supported by PptxGenJS**
+- PptxGenJS can embed SVG data, but SVG compatibility varies across PowerPoint versions. Prefer PNG for maximum compatibility and render-test any SVG before delivery.
 - See `safeAddImage` pattern in [resources.md](resources.md)
 
 ### Text overflow / wrapping unexpectedly
@@ -152,23 +152,9 @@ PowerShell does NOT support `&&`. Either:
 
 ## Environment Setup Issues
 
-### `python -m markitdown` fails (`No module named markitdown`)
+### A text-extraction utility is unavailable
 
-markitdown is convenient but optional. Full fallback plan:
-
-1. **Quick install** (try first):
-   ```bash
-   pip install "markitdown[pptx]"
-   pip install "markitdown[all]"   # if first fails
-   ```
-
-2. **If pip install fails** (offline env, restricted repo):
-   ```bash
-   pip install python-pptx
-   ```
-   Then use the python-pptx fallback in [pitfalls.md → §QA Tool Fallback](pitfalls.md#qa-tool-fallback-when-markitdown-fails).
-
-3. **If Python is unavailable entirely**: use the Node-only `qa.js` shipped in [build-config.md](build-config.md#slidesqajs-node-based-text-extraction--no-python-required). Requires no Python — runs pure Node.
+Text extraction is optional and does not replace render QA. Use the Node-only `qa.js` shipped in the [starter deck](build-config.md#starter-deck-assets) for source, STORY, package, placeholder, and density checks. Use `scripts/render-slides.py` plus `scripts/qa-render.py` for the mandatory visual path.
 
 ### `npm install` fails with `EPERM` on Windows
 
@@ -184,7 +170,7 @@ Or set permanently:
 npm config set cache ./.npm-cache --userconfig ./.npmrc
 ```
 
-Add `.npm-cache/` to `.gitignore`. Full details in [build-config.md → §Windows install workaround](build-config.md#windows-install-workaround-npm-cache-eperm).
+Add `.npm-cache/` to `.gitignore`. Full details are in [build-config.md → Windows npm cache fallback](build-config.md#windows-npm-cache-fallback).
 
 ### `node compile.js` fails with `SyntaxError: Invalid or unexpected token` on first character
 
@@ -200,14 +186,11 @@ Write-Host ("0x{0:X2} 0x{1:X2}" -f $bytes[0], $bytes[1])
 
 ### Chinese characters render as boxes (□□□) on reviewer's machine
 
-`Microsoft YaHei` is missing from the reviewer's system. Fix with the cross-platform font fallback chain in [design-system.md → §Font Fallback Chain](design-system.md#font-fallback-chain-cross-platform--mandatory-for-any-user-who-isnt-on-windows).
+`Microsoft YaHei` is missing from the reviewer's system. Select one real installed font for the build platform; do not pass a comma-separated CSS list. See [design-system.md → §Cross-Platform Font Selection](design-system.md#cross-platform-font-selection).
 
 ```javascript
-// WRONG — breaks on macOS / Linux
-fontFace: 'Microsoft YaHei'
-
-// RIGHT — survives cross-platform
-fontFace: 'Microsoft YaHei, PingFang SC, Hiragino Sans GB, Noto Sans CJK SC, sans-serif'
+// Platform-selected single font name
+fontFace: helpers.FONTS.cn
 ```
 
-The `FONT_CN` constant is defined in `_helpers.js` (see [build-config.md](build-config.md#slides_helpersjs-shared-reusable-components)).
+The platform font selector is defined in `_helpers.js`; see [build-config.md](build-config.md#shared-helpers).

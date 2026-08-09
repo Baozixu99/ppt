@@ -8,33 +8,21 @@ For any visual element, follow this priority:
 
 1. **User-provided** — if the user attached files, use them first
 2. **Verified online source** — see source whitelist below
-3. **Generated on-the-fly** — SVG drawn directly in PptxGenJS using shapes
-4. **LAST RESORT**: themed placeholder (text + accent shape only)
+3. **Generated for the task** — use an image-generation tool for illustrative visuals or a consistent icon source for functional symbols
+4. **Simple native shapes** — only for diagrams or structural elements that benefit from editability
+5. **LAST RESORT**: themed placeholder (text + accent shape only)
 
 ## Image Sources
 
 | Source | Best For | License | How to Get |
 |--------|----------|---------|------------|
 | User-provided files | Exact matches | N/A | Copy to `slides/imgs/` |
-| Unsplash Source | Topic photos | Free (Unsplash License) | `curl "https://source.unsplash.com/featured/?keyword" -o img.jpg` |
-| Picsum | Placeholder photos | Free (CC0) | `curl "https://picsum.photos/800/600" -o img.jpg` |
-| Pexels API | Curated stock photos | Free | Requires API key (free tier) |
-| WebSearch | Specific current events | N/A | Use sparingly, verify licensing |
+| Unsplash API | Topic photos | Unsplash License and API terms | Requires API access, photographer attribution, and download tracking |
+| Pexels API | Curated stock photos | Pexels License and API terms | Requires an API key and attribution review |
+| Image search | Specific subjects or current events | Source-specific | Verify the original page, author, license, and permitted use |
+| Image generation | Illustrative or abstract visuals | Tool-specific | Preserve the prompt and applicable usage terms |
 
-### Unsplash Source Example
-
-```bash
-# Cross-platform — works in PowerShell, bash, zsh
-mkdir -p slides/imgs
-curl -L "https://source.unsplash.com/featured/?technology,800x600" -o slides/imgs/tech-hero.jpg
-```
-
-### Picsum (Always-works fallback)
-
-```bash
-# Deterministic by seed — same image every time
-curl -L "https://picsum.photos/seed/cover-hero/800/600" -o slides/imgs/cover.jpg
-```
+Do not use the retired `source.unsplash.com` endpoint. Do not label search results as license-free without checking the original asset page.
 
 ## Icon Sources
 
@@ -54,14 +42,14 @@ Since PptxGenJS does not render arbitrary SVG paths cleanly, use this pattern:
 ```javascript
 // Use simple shape compositions as icon substitutes
 function renderIconCircle(slide, pres, theme, x, y, size, color) {
-  slide.addShape(pres.shapes.OVAL, {
+  slide.addShape(pres.ShapeType.ellipse, {
     x, y, w: size, h: size,
     fill: { color: color || theme.accent }
   });
 }
 
 function renderNumberedIcon(slide, pres, theme, x, y, num, size) {
-  slide.addShape(pres.shapes.OVAL, {
+  slide.addShape(pres.ShapeType.ellipse, {
     x, y, w: size, h: size,
     fill: { color: theme.accent }
   });
@@ -81,15 +69,15 @@ For charts and statistics:
 |--------|--------|----------|
 | User-provided CSV/JSON | Direct | Authoritative data |
 | WebSearch result | Parse manually | Industry reports, public stats |
-| Pre-defined JSON template | `slides/data/*.json` | Recurring deck structures |
+| Pre-defined JSON template | `slides/_data/*.json` | Recurring deck structures |
 
 ### Data File Convention
 
-Place data files in `slides/data/`:
+Place data files in `slides/_data/`:
 
 ```
 slides/
-  data/
+  _data/
     chart-01-revenue.json
     chart-02-growth.json
     table-01-team.json
@@ -141,7 +129,7 @@ function safeAddImage(slide, pres, theme, relativePath, options) {
   const absPath = path.join(__dirname, relativePath);
   if (!fs.existsSync(absPath)) {
     console.warn("Image missing: " + relativePath + " — using fallback shape");
-    slide.addShape(pres.shapes.RECTANGLE, Object.assign({}, options, {
+    slide.addShape(pres.ShapeType.rect, Object.assign({}, options, {
       fill: { color: theme.light },
       line: { color: theme.accent, width: 1, dashType: "dash" }
     }));

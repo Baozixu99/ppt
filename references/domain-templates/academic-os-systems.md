@@ -48,7 +48,7 @@ Map to paper: §1 Introduction + §2 Background/Related Work + §3 Motivation.
 | 1.6 | Content | Our contributions — 4-item card grid | §1 contributions list |
 | 1.7 | Optional | "Paper organization" roadmap | §1 last paragraph |
 
-> **Section header notation**: use `1.1`, `1.2`, ... to mirror paper sections. See [academic-patterns.md → §Section Number Mapping](academic-patterns.md#section-number-mapping-convention).
+> **Section header notation**: use `1.1`, `1.2`, ... to mirror paper sections. See [academic-patterns.md → §Section Number Mapping](../academic-patterns.md#section-number-mapping-convention).
 
 ### Part 2 — 系统模型 (3-4 slides)
 
@@ -99,7 +99,7 @@ Map to paper: §8 Evaluation + §9 Discussion + §10 Conclusion.
 
 ### Color Palette
 
-Recommended palettes (from [design-system.md](design-system.md)):
+Recommended palettes (from [design-system.md](../design-system.md)):
 
 | Palette | Hex | Best for |
 |---------|-----|----------|
@@ -115,7 +115,7 @@ For data-heavy systems papers (≥ 5 charts), prefer **Education & Charts** beca
 - Subtitles in **Microsoft YaHei Bold 14pt** with `theme.primary`
 - Main titles in **Microsoft YaHei Bold 22pt** black
 - Body text in **Microsoft YaHei 11-12pt** with `theme.secondary`
-- Always include the cross-platform font fallback chain — see [design-system.md → §Font Fallback Chain](design-system.md#font-fallback-chain)
+- Select one real, installed CJK font for the target platform — see [design-system.md → §Cross-Platform Font Selection](../design-system.md#cross-platform-font-selection)
 
 ### Style Recipe
 
@@ -171,14 +171,14 @@ Total = ~25 slides. Adjust if paper has 7 or 9 main sections (use §7-Eval as a 
 
 ## Recommended Helpers (`_helpers.js` extensions)
 
-For systems papers, add these helpers to `_helpers.js` (extends the base in [build-config.md](build-config.md#slides_helpersjs-shared-reusable-components)):
+For systems papers, add these helpers to `_helpers.js` (extends the base in [build-config.md](../build-config.md#starter-deck-assets)):
 
 ```javascript
 // systems-paper-specific helpers
 function systemDiagram(slide, pres, theme, opts) {
   // opts: { layers: [{label, color, y, h}], connections: [[from, to]] }
   opts.layers.forEach(layer => {
-    slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+    slide.addShape(pres.ShapeType.roundRect, {
       x: 0.5, y: layer.y, w: 9.0, h: layer.h,
       fill: { color: layer.color }, line: { color: theme.primary, width: 1 },
       rectRadius: 0.06
@@ -190,7 +190,7 @@ function systemDiagram(slide, pres, theme, opts) {
     });
   });
   opts.connections.forEach(([from, to]) => {
-    slide.addShape(pres.shapes.LINE, {
+    slide.addShape(pres.ShapeType.line, {
       x: from.x, y: from.y, w: to.x - from.x, h: to.y - from.y,
       line: { color: theme.primary, width: 1.5, endArrowType: 'triangle' }
     });
@@ -203,7 +203,7 @@ function comparisonTable(slide, pres, theme, opts) {
   opts.rows.forEach((row, i) => {
     const y = opts.y + 0.3 + i * rowH;
     // Tag (left column)
-    slide.addShape(pres.shapes.RECTANGLE, {
+    slide.addShape(pres.ShapeType.rect, {
       x: opts.x, y, w: 2.6, h: rowH - 0.05,
       fill: { color: row.color }, line: { color: row.color, width: 0 }
     });
@@ -229,7 +229,7 @@ function comparisonTable(slide, pres, theme, opts) {
 
 function algorithmListing(slide, pres, theme, opts) {
   // opts: { title, lines: [{code, comment}], x, y, w, h }
-  slide.addShape(pres.shapes.RECTANGLE, {
+  slide.addShape(pres.ShapeType.roundRect, {
     x: opts.x, y: opts.y, w: opts.w, h: opts.h,
     fill: { color: theme.primary }, line: { color: theme.primary, width: 0 },
     rectRadius: 0.04
@@ -254,7 +254,7 @@ function algorithmListing(slide, pres, theme, opts) {
 
 ## Pre-Delivery Checklist (For This Domain)
 
-Beyond the global [QA Checklist](pitfalls.md#qa-checklist-mandatory--use-before-declaring-success), verify:
+Beyond the global [QA Checklist](../pitfalls.md#qa-checklist-mandatory--use-before-declaring-success), verify:
 
 - [ ] Section numbers (1.1, 1.2, ...) match the paper exactly — committee will cross-check
 - [ ] Every chart has a `Source:` citation referencing the paper's Fig./Table number

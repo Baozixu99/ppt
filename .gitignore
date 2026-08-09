@@ -14,10 +14,14 @@ node_modules/
 npm-debug.log*
 .npm-cache/
 
+# Python
+__pycache__/
+*.pyc
+
 # Local artifacts from PPT creation workflow
 slides/imgs/
 slides/output/
 slides/package-lock.json
 
-# Cursor / skill runtime metadata
+# Skill runtime metadata
 .cursor/
