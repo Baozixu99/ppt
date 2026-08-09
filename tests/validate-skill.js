@@ -13,6 +13,18 @@ function walk(dir) {
 }
 
 const skill = fs.readFileSync(path.join(root, 'SKILL.md'), 'utf8');
+const skillhubMetaPath = path.join(root, '_skillhub_meta.json');
+let expectedSkillName = path.basename(root);
+if (fs.existsSync(skillhubMetaPath)) {
+  try {
+    const skillhubMeta = JSON.parse(fs.readFileSync(skillhubMetaPath, 'utf8'));
+    if (typeof skillhubMeta.name === 'string' && skillhubMeta.name.trim()) {
+      expectedSkillName = skillhubMeta.name.trim();
+    }
+  } catch {
+    failures.push('Cannot parse _skillhub_meta.json.');
+  }
+}
 const licensePath = path.join(root, 'LICENSE');
 if (!fs.existsSync(licensePath) || !/^MIT License\r?$/m.test(fs.readFileSync(licensePath, 'utf8'))) {
   failures.push('Root LICENSE must contain the selected MIT License.');
@@ -31,7 +43,7 @@ if (!frontmatter) failures.push('SKILL.md has no YAML frontmatter.');
 else {
   const name = /^name:\s*(.+)$/m.exec(frontmatter[1]);
   const description = /^description:\s*(.+)$/m.exec(frontmatter[1]);
-  if (!name || name[1].trim() !== path.basename(root)) failures.push('Skill name must match the parent directory.');
+  if (!name || name[1].trim() !== expectedSkillName) failures.push('Skill name must match _skillhub_meta.json name.');
   if (!description || !description[1].trim()) failures.push('Skill description is missing.');
   const keys = Array.from(frontmatter[1].matchAll(/^([A-Za-z0-9_-]+):/gm), (match) => match[1]);
   const extra = keys.filter((key) => !['name', 'description'].includes(key));
