@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "mode": "lite",
+  "renderer": "pptxgenjs",
+  "goal": "Build a valid editable PowerPoint smoke fixture",
+  "audience": "pptx-generator maintainer",
+  "use": "Automated starter-deck verification",
+  "durationMinutes": null,
+  "slideBudget": {
+    "target": 1,
+    "min": 1,
+    "max": 1
+  },
+  "density": "standard",
+  "visualDirection": "Minimal light smoke-test composition",
+  "mustInclude": [
+    "editable text",
+    "source notes"
+  ],
+  "mustAvoid": [
+    "unresolved placeholders"
+  ],
+  "sourceInputs": [
+    {
+      "kind": "internal",
+      "label": "Starter fixture",
+      "path": "sources.json"
+    }
+  ],
+  "assumptions": [],
+  "unresolvedHighImpact": [],
+  "checkpoints": {
+    "story": "waived",
+    "visualPreview": "waived",
+    "waiverReason": "Single-slide smoke fixture"
+  }
+}

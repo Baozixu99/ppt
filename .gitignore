@@ -13,6 +13,7 @@ desktop.ini
 node_modules/
 npm-debug.log*
 .npm-cache/
+.tmp-*/
 
 # Python
 __pycache__/

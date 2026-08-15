@@ -12,8 +12,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --ignore-scripts --no-audit --no-fund --prefix assets/starter-deck
+      - run: python3 -m pip install -r scripts/requirements-render.txt
       - run: node tests/validate-skill.js
+      - run: node tests/test-qa.js
+      - run: node tests/test-theme.js
+      - run: node tests/test-helpers.js
       - run: node tests/smoke-test.js
         env:
           PPTX_TEST_PYTHON: python3
+          PPTX_TEST_NODE_PATH: ${{ github.workspace }}/assets/starter-deck/node_modules
+      - run: node tests/competition-smoke-test.js
+        env:
+          PPTX_TEST_NODE_PATH: ${{ github.workspace }}/assets/starter-deck/node_modules
+      - run: python3 tests/test-pptx-validation.py
+      - run: python3 tests/test-render-tools.py
       - run: python3 -m py_compile scripts/*.py

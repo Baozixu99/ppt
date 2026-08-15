@@ -1,5 +1,13 @@
 # Design System
 
+## Contents
+
+- [Color palette reference](#color-palette-reference)
+- [Color palette rules](#color-palette-rules)
+- [Font reference](#font-reference)
+- [Style recipes](#style-recipes)
+- [Chart style recipe](#chart-style-recipe)
+
 ## Color Palette Reference
 
 | # | Name | Colors | Style | Use Cases | Tips |
@@ -125,16 +133,16 @@ For tinted overlays, borders, and hover states, use the `opacity` property (0.0-
 
 ---
 
-## Color Palette Rules (MANDATORY)
+## Color Palette Rules
 
 ### Strict Palette Adherence
 
-**Use ONLY the provided color palette. Do NOT create or modify colors.**
+Choose one palette per deck and derive a small documented token set from it. User templates and explicit brand directions take precedence.
 
-- All colors must come from the user-provided palette
-- Do NOT use colors outside the palette
-- Do NOT modify palette colors (brightness, saturation, mixing)
-- **Only exception**: Add transparency using the `transparency` property (0-100)
+- Use palette tokens for recurring semantic roles rather than scattering raw literals across slide modules.
+- Neutral white, black, gray, border, success, warning, and danger tokens may be added when the selected palette does not provide them.
+- Record derived tokens once in the deck theme; do not invent colors independently on each slide.
+- Add transparency through the `transparency` property (0-100), not an 8-character color string.
 
 ```javascript
 // Correct: Using palette colors
@@ -145,13 +153,13 @@ slide.addText('Title', { color: theme.accent });
 slide.addShape(pres.ShapeType.rect, { fill: { color: '1a1a2e' } });
 ```
 
-### No Gradients
+### Gradients
 
-**Gradients are prohibited. Use solid colors only.**
+Use solid colors by default. A user template or explicit visual direction may use a tested gradient image; PowerPoint-native gradient behavior is not assumed portable.
 
-### No Animations
+### Animations
 
-**Animations and transitions are prohibited.** All slides must be static.
+Generated decks are static by default. Preserve existing template transitions when editing, and add animation only when the user explicitly requests it and the selected renderer supports reliable verification.
 
 ## Font Reference
 
@@ -198,7 +206,7 @@ The starter deck defines this once in `_helpers.js`. Before a high-stakes delive
 | Palatino | Garamond |
 | Consolas | Calibri |
 
-**Choose an interesting font pairing** - don't default to Arial for everything. Pick a header font with personality and pair it with a clean body font.
+Prefer one dependable CJK font and one dependable Latin font. Decorative pairings are optional and must not reduce portability or academic readability.
 
 ### No Bold for Body Text
 

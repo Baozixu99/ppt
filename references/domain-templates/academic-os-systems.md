@@ -2,19 +2,31 @@
 
 > **Use when**: presenting a research paper in **Operating Systems, Virtualization, Embedded Systems, Real-time Systems, Distributed Systems, or Architecture**. These domains share a stable narrative arc that academic reviewers and committees expect.
 
-## Standard Narrative Arc (4-part, 20-25 slides)
+## Contents
+
+- [Standard narrative arc](#standard-narrative-arc-4-part-typically-20-27-slides-total)
+- [Slide-by-slide template](#slide-by-slide-template)
+- [Design choices](#design-choices-that-match-systems-papers)
+- [Mapping slides to paper sections](#mapping-slide--paper-section-convention)
+- [Recommended helpers](#recommended-helpers-_helpersjs-extensions)
+- [Pre-delivery checklist](#pre-delivery-checklist-for-this-domain)
+- [Other domain templates](#other-domain-templates)
+
+## Standard Narrative Arc (4-part, typically 20-27 slides total)
 
 Every systems paper can be mapped to this skeleton. The mapping to paper sections is **opinionated** but matches the structure used by SOSP / OSDI / EuroSys / RTSS / EMSOFT / DAC / MICRO / USENIX ATC communities.
 
 ```
-Part 1: 背景与动机     (Background & Motivation)        — 6-8 slides
-Part 2: 系统模型       (System Model / Problem)         — 3-4 slides
-Part 3: 设计与实现     (Design & Implementation)        — 6-8 slides
-Part 4: 评估与结论     (Evaluation & Conclusion)        — 5-7 slides
+Cover + navigation                                    — 1-2 slides
+Part 1: 背景与动机     (Background & Motivation)        — 4-5 slides including divider
+Part 2: 系统模型       (System Model / Problem)         — 3-4 slides including divider
+Part 3: 设计与实现     (Design & Implementation)        — 6-7 slides including divider
+Part 4: 评估与结论     (Evaluation & Conclusion)        — 5-7 slides including divider
+Summary / Q&A                                         — 1-2 slides
 TOTAL                                                20-27 slides
 ```
 
-Each part gets a Section Divider slide. Add Cover + TOC + Summary at the ends.
+The ranges above already include section dividers and end matter. Do not add them again when calculating the slide budget. A competition defense may replace the TOC or some dividers with evidence-led transition slides.
 
 ---
 
@@ -113,8 +125,8 @@ For data-heavy systems papers (≥ 5 charts), prefer **Education & Charts** beca
 
 - Section numbers (e.g., "1.1") in **Arial Bold 24-28pt** with `theme.accent` color
 - Subtitles in **Microsoft YaHei Bold 14pt** with `theme.primary`
-- Main titles in **Microsoft YaHei Bold 22pt** black
-- Body text in **Microsoft YaHei 11-12pt** with `theme.secondary`
+- Main titles in **Microsoft YaHei Bold 30-36pt** black
+- Body text in **Microsoft YaHei 14-18pt** with `theme.secondary`; use 14pt only for deliberately dense academic layouts and verify it in the native render
 - Select one real, installed CJK font for the target platform — see [design-system.md → §Cross-Platform Font Selection](../design-system.md#cross-platform-font-selection)
 
 ### Style Recipe
@@ -175,7 +187,7 @@ For systems papers, add these helpers to `_helpers.js` (extends the base in [bui
 
 ```javascript
 // systems-paper-specific helpers
-function systemDiagram(slide, pres, theme, opts) {
+function systemDiagram(slide, pres, theme, helpers, opts) {
   // opts: { layers: [{label, color, y, h}], connections: [[from, to]] }
   opts.layers.forEach(layer => {
     slide.addShape(pres.ShapeType.roundRect, {
@@ -190,9 +202,9 @@ function systemDiagram(slide, pres, theme, opts) {
     });
   });
   opts.connections.forEach(([from, to]) => {
-    slide.addShape(pres.ShapeType.line, {
-      x: from.x, y: from.y, w: to.x - from.x, h: to.y - from.y,
-      line: { color: theme.primary, width: 1.5, endArrowType: 'triangle' }
+    // Normalizes left/up connectors so DrawingML never receives negative extents.
+    helpers.addConnector(slide, pres, from, to, {
+      color: theme.primary, width: 1.5, endArrowType: 'triangle'
     });
   });
 }
@@ -260,7 +272,7 @@ Beyond the global [QA Checklist](../pitfalls.md#qa-checklist-mandatory--use-befo
 - [ ] Every chart has a `Source:` citation referencing the paper's Fig./Table number
 - [ ] All theorem / formal definition text uses serif (Cambria / Georgia) for mathematical distinction
 - [ ] Implementation slides cite the hardware/OS versions explicitly
-- [ ] Conclusion slide quotes the paper's claimed contribution verbatim (paraphrasing is fine but facts must match)
+- [ ] Conclusion slide preserves the paper's claimed contribution accurately; quote only when exact wording is useful and traceable
 - [ ] Future work slide mentions the same open questions as paper §10
 
 ---

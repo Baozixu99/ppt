@@ -1,6 +1,20 @@
 # Slide Page Types
 
-Classify **every slide** as **exactly one** of these 5 types:
+Classify every slide by its primary intent as one of seven core types: `cover`, `toc`, `divider`, `content`, `timeline`, `comparison`, or `summary`. Hybrid pages still choose the closest primary type.
+
+## Contents
+
+- [1. Cover page](#1-cover-page)
+- [2. Table of contents](#2-table-of-contents)
+- [3. Section divider](#3-section-divider)
+- [4. Content page](#4-content-page)
+- [5. Summary / closing page](#5-summary--closing-page)
+- [Additional layout patterns](#additional-layout-patterns)
+- [6. Timeline / process page](#6-timeline--process-page-upgraded)
+- [7. Comparison page](#7-comparison-page-upgraded)
+- [Updated type summary](#updated-type-summary)
+- [8. Mixed / hybrid pages](#8-mixed--hybrid-pages)
+- [9. Extended patterns reference](#9-extended-patterns-reference)
 
 ## 1. Cover Page
 
@@ -32,10 +46,10 @@ Classify **every slide** as **exactly one** of these 5 types:
 
 | Element | Recommended Size | Ratio to Base |
 |---------|-----------------|---------------|
-| Main Title | 72-120px | 3x-5x |
-| Subtitle | 28-40px | 1.5x-2x |
-| Supporting Text | 18-24px | 1x (base) |
-| Meta Info (date, name) | 14-18px | 0.7x-1x |
+| Main Title | 50-72pt | 3x-5x |
+| Subtitle | 24-32pt | 1.5x-2x |
+| Supporting Text | 18-24pt | 1x (base) |
+| Meta Info (date, name) | 12-16pt | 0.7x-1x |
 
 **Key Principles:**
 1. **Dramatic Contrast**: Main title should be at least 2-3x larger than subtitle
@@ -110,10 +124,10 @@ Consider: Purpose (corporate/educational/creative), Audience, Tone, Content Volu
 
 | Element | Recommended Size | Ratio to Base |
 |---------|-----------------|---------------|
-| Page Title ("Table of Contents" / "Agenda") | 36-44px | 2.5x-3x |
-| Section Number | 28-36px | 2x-2.5x |
-| Section Title | 20-28px | 1.5x-2x |
-| Section Description | 14-16px | 1x (base) |
+| Page Title ("Table of Contents" / "Agenda") | 35-44pt | 2.5x-3x |
+| Section Number | 28-36pt | 2x-2.5x |
+| Section Title | 20-28pt | 1.5x-2x |
+| Section Description | 16-18pt | 1x (base) |
 
 **Key Principles:**
 1. **Clear Numbering**: Section numbers should be visually prominent — bold, accent color, or larger size
@@ -189,9 +203,9 @@ Consider: Purpose (corporate/educational/creative), Audience, Tone, Content Volu
 
 | Element | Recommended Size | Notes |
 |---------|-----------------|-------|
-| Section Number | 72-120px | Bold, accent color or semi-transparent |
-| Section Title | 36-48px | Bold, clear, primary text color |
-| Intro Text | 16-20px | Light weight, muted color, optional |
+| Section Number | 54-84pt | Bold, accent color or semi-transparent |
+| Section Title | 35-48pt | Bold, clear, primary text color |
+| Intro Text | 16-20pt | Light weight, muted color, optional |
 
 **Key Principles:**
 1. **Dramatic Number**: Section number = most prominent visual element
@@ -282,11 +296,11 @@ Pick a subtype based on the content. Each content slide belongs to exactly ONE s
 
 | Element | Recommended Size | Notes |
 |---------|-----------------|-------|
-| Slide Title | 36-44px | Bold, top of slide |
-| Section Header | 20-24px | Bold, for sub-sections within slide |
-| Body Text | 14-16px | Regular weight, left-aligned |
-| Captions / Source | 10-12px | Muted color, smallest text |
-| Stat Callout | 60-72px | Large bold numbers for key statistics |
+| Slide Title | 35-44pt | Bold, top of slide |
+| Section Header | 20-24pt | Bold, for sub-sections within slide |
+| Body Text | 16-20pt | Regular weight, left-aligned; 14pt is a dense-academic exception requiring native-render review |
+| Captions / Source | 10-12pt | Muted color, smallest text |
+| Stat Callout | 60-72pt | Large bold numbers for key statistics |
 
 **Key Principles:**
 1. **Left-align body text** — never center paragraphs or bullet lists
@@ -307,7 +321,7 @@ Pick a subtype based on the content. Each content slide belongs to exactly ONE s
 1. **Subtype**: Determine first — drives the entire layout
 2. **Content Volume**: Dense → multi-column or smaller font; Light → larger elements with more whitespace
 3. **Data vs Narrative**: Data-heavy → charts + stat callouts; Story-driven → images + quotes
-4. **Variety**: Each content slide should use a different layout from the previous one
+4. **Variety**: Avoid three consecutive slides with the same visual silhouette; adjacent slides may share a stable grid when that improves comparison or section coherence
 5. **Consistency**: Typography, colors, and spacing must match the rest of the presentation
 
 ### Workflow
@@ -361,10 +375,10 @@ Pick a subtype based on the content. Each content slide belongs to exactly ONE s
 
 | Element | Recommended Size | Notes |
 |---------|-----------------|-------|
-| Closing Title ("Thank You" / "Summary") | 48-72px | Bold, commanding |
-| Takeaway / Action Item | 18-24px | Clear, scannable |
-| Supporting Text | 14-16px | Regular weight |
-| Contact Info | 14-16px | Muted color |
+| Closing Title ("Thank You" / "Summary") | 48-72pt | Bold, commanding |
+| Takeaway / Action Item | 18-24pt | Clear, scannable |
+| Supporting Text | 16-18pt | Regular weight |
+| Contact Info | 14-16pt | Muted color |
 
 **Key Principles:**
 1. **Strong closing statement**: Main message should be largest, most prominent

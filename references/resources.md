@@ -2,15 +2,26 @@
 
 Every slide that needs visual content MUST source assets through this workflow. Do NOT skip this step — placeholder visuals are the #1 cause of low-quality AI-generated decks.
 
+## Contents
+
+- [Asset priority order](#asset-priority-order)
+- [Image sources](#image-sources)
+- [Icon sources](#icon-sources)
+- [Data sources](#data-sources)
+- [Scientific notation and formulas](#scientific-notation--formulas)
+- [Asset quality rules](#asset-quality-rules)
+- [Image insertion pattern](#image-insertion-pattern-pptxgenjs)
+
 ## Asset Priority Order
 
 For any visual element, follow this priority:
 
 1. **User-provided** — if the user attached files, use them first
 2. **Verified online source** — see source whitelist below
-3. **Generated for the task** — use an image-generation tool for illustrative visuals or a consistent icon source for functional symbols
-4. **Simple native shapes** — only for diagrams or structural elements that benefit from editability
-5. **LAST RESORT**: themed placeholder (text + accent shape only)
+3. **Editable native shapes** — preferred for technical diagrams, processes, architecture, and structural visuals
+4. **Generated for the task** — use an image-generation tool only when a bitmap illustration materially improves the slide
+
+Missing required assets are build errors. Do not silently substitute a placeholder in a final deck.
 
 ## Image Sources
 
@@ -121,6 +132,17 @@ NEVER:
 
 ## Image Insertion Pattern (PptxGenJS)
 
+For an externally sourced image, prefer the starter helper so the image alt text and speaker notes carry the same source ID:
+
+```javascript
+helpers.addSourcedImage(slide, ['image-source-id'], {
+  path: absPath, x: 1, y: 1, w: 5, h: 3,
+  altText: 'Audience-facing description'
+});
+```
+
+The corresponding record must exist in `sources.json`.
+
 ```javascript
 const fs = require("fs");
 const path = require("path");
@@ -128,16 +150,7 @@ const path = require("path");
 function safeAddImage(slide, pres, theme, relativePath, options) {
   const absPath = path.join(__dirname, relativePath);
   if (!fs.existsSync(absPath)) {
-    console.warn("Image missing: " + relativePath + " — using fallback shape");
-    slide.addShape(pres.ShapeType.rect, Object.assign({}, options, {
-      fill: { color: theme.light },
-      line: { color: theme.accent, width: 1, dashType: "dash" }
-    }));
-    slide.addText("[Image Placeholder]", Object.assign({}, options, {
-      fontSize: 10, color: theme.secondary,
-      align: "center", valign: "middle", bold: false
-    }));
-    return false;
+    throw new Error("Required image is missing: " + relativePath);
   }
   slide.addImage({ path: absPath, x: options.x, y: options.y, w: options.w, h: options.h });
   return true;

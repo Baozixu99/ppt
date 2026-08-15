@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "name": "pptx-generator",
+  "entry": "SKILL.md",
+  "repository": "https://github.com/Baozixu99/ppt",
+  "repositoryMode": "repository-is-skill",
+  "installDirectoryName": "pptx-generator",
+  "dependencyInstall": "deferred-until-deck-scaffold",
+  "runtime": [
+    "SKILL.md",
+    "agents/**",
+    "assets/**",
+    "references/**",
+    "scripts/**",
+    "LICENSE",
+    "_skillhub_meta.json"
+  ],
+  "development": [
+    "tests/**",
+    ".github/**",
+    "README.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md"
+  ],
+  "generated": [
+    "node_modules/**",
+    "output/**",
+    ".npm-cache/**",
+    "__pycache__/**",
+    ".tmp-*/**"
+  ],
+  "intentRoutes": {
+    "install-use": "Install the repository as pptx-generator, validate it, then enter through SKILL.md.",
+    "normal-use": "Load SKILL.md and only the references selected by its routing instructions.",
+    "modify": "Preserve local changes, edit the same checkout, add regression coverage, and validate.",
+    "update": "Inspect Git state and preserve or merge local improvements before pulling or replacing files.",
+    "contribute": "Read CONTRIBUTING.md and run the applicable full test matrix before submission."
+  },
+  "validation": [
+    "node tests/validate-skill.js",
+    "node tests/smoke-test.js",
+    "node tests/competition-smoke-test.js",
+    "python tests/test-render-tools.py",
+    "python tests/test-pptx-validation.py"
+  ]
+}

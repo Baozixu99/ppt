@@ -13,7 +13,8 @@ Choose narrative and visual routes independently. A domain match does not author
 
 | Scenario | Route | Apply |
 |---|---|---|
-| OS, virtualization, real-time systems paper or defense | Full domain match | `domain-templates/academic-os-systems.md`, paper-section mapping, and domain checklist |
+| OS, virtualization, or real-time systems **paper talk** with stable paper sections | Systems paper | `domain-templates/academic-os-systems.md`; use paper-section mapping only when cross-reference is useful |
+| Technical competition defense or project final report | Competition evidence | Decision-led arc: problem pressure → contribution → engineering depth → experiment validity → headline results → impact; do not force paper-section mapping |
 | Academic but outside systems | Partial academic match | Retain problem–method–evidence–conclusion arc; rewrite terminology, evidence types, and visuals |
 | Business, annual report, consulting | General business | Decision-led story, Sharp or Soft density, data/source discipline |
 | Training or education | Teaching | Learning objective, concept sequence, examples, recap |

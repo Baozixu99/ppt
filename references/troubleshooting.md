@@ -4,11 +4,20 @@ When something fails, work through this in order. Do NOT retry the same step bli
 
 This document covers **PptxGenJS-specific** issues and **slide quality** issues. For general Node.js, npm, or PowerShell problems, consult platform documentation — those are not PPT Skill concerns.
 
+## Contents
+
+- [PptxGenJS errors](#pptxgenjs-errors)
+- [Slide quality issues](#slide-quality-issues-after-build-succeeds)
+- [When all else fails](#when-all-else-fails)
+- [Environment setup issues](#environment-setup-issues)
+
 ---
 
 ## PptxGenJS Errors
 
 ### File generated but wont open / shows "File is corrupt"
+
+Run `scripts/validate-pptx.py` first. In addition to ZIP/XML relationships, it rejects negative DrawingML extents. Negative `w` or `h` values—commonly produced by `to.x - from.x` or `to.y - from.y` for left/up connectors—can create a package that is well-formed XML but cannot be opened by PowerPoint. Use `helpers.addConnector()` or normalize coordinates and arrow direction before calling `addShape`.
 
 Usually one of these:
 

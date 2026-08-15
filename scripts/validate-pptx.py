@@ -11,6 +11,7 @@ from xml.etree import ElementTree
 
 
 REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
+A_NS = "http://schemas.openxmlformats.org/drawingml/2006/main"
 REQUIRED = {"[Content_Types].xml", "_rels/.rels", "ppt/presentation.xml"}
 
 
@@ -54,6 +55,18 @@ def main() -> int:
             except ElementTree.ParseError as exc:
                 errors.append(f"Invalid XML {name}: {exc}")
                 continue
+            for extent in root.iter(f"{{{A_NS}}}ext"):
+                for axis in ("cx", "cy"):
+                    raw = extent.attrib.get(axis)
+                    if raw is None:
+                        continue
+                    try:
+                        value = int(raw)
+                    except ValueError:
+                        errors.append(f"Invalid DrawingML extent in {name}: {axis}={raw}")
+                        continue
+                    if value < 0:
+                        errors.append(f"Negative DrawingML extent in {name}: {axis}={raw}")
             if not name.endswith(".rels"):
                 continue
             source_part = source_part_for_rels(name)

@@ -2,6 +2,8 @@
 
 Use this contract in full mode. Create `slides/STORY.md` before slide implementation. Lite mode may keep the same structure in memory.
 
+The PptxGenJS starter runs `validate-contracts.js` before build. Full and high-stakes builds must fail when STORY is missing, malformed, outside the slide budget, or references unknown source IDs.
+
 ## Required table
 
 ```markdown

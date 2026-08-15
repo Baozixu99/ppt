@@ -7,9 +7,12 @@
     "node": ">=18"
   },
   "scripts": {
+    "contracts": "node validate-contracts.js",
     "build": "node compile.js",
+    "preview": "node compile.js --output output/preview.pptx",
     "qa": "node qa.js",
-    "verify": "npm run build && npm run qa"
+    "verify": "npm run build && npm run qa",
+    "verify:static": "npm run verify"
   },
   "dependencies": {
     "jszip": "3.10.1",

@@ -1,4 +1,4 @@
 interface:
   display_name: "PPTX Generator"
-  short_description: "Create, edit, and visually verify PowerPoint decks"
-  default_prompt: "Use $pptx-generator to create an editable, source-tracked PowerPoint deck and verify every rendered slide."
+  short_description: "Build source-tracked, verified PowerPoint decks"
+  default_prompt: "Use $pptx-generator to turn my source material into an editable, source-tracked PowerPoint deck with a validated story and full-slide visual QA."

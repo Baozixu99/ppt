@@ -2,6 +2,15 @@
 
 > **Purpose**: keep paper-specific numbers (chart values, table rows, KPI figures) **out of view code**. When you update a figure from the paper, you change **one file**, not 25.
 
+## Contents
+
+- [The problem](#the-problem)
+- [The solution: `_data/` folder](#the-solution-_data-folder)
+- [When to use this pattern](#when-to-use-this-pattern)
+- [File naming](#file-naming)
+- [Anti-patterns](#anti-patterns)
+- [Cross-references](#cross-references)
+
 ## The Problem
 
 Without a data layer, chart values get hardcoded inside `slide-22.js`, `slide-23.js`, etc:
@@ -75,7 +84,7 @@ module.exports = {
 };
 ```
 
-> **Unicode escape convention**: For Chinese strings, prefer `\uXXXX` escapes over literal Chinese in source files. This avoids encoding pitfalls on Windows tooling (see [pitfalls.md → §Windows-Only Disasters](pitfalls.md#windows-only-disasters-cross-platform-encoding)) and makes files grep-friendly.
+> **Encoding convention**: Store source files as UTF-8 and keep Chinese text literal so the content remains reviewable and token-efficient. Use `\uXXXX` only for isolated control characters or when a verified legacy tool cannot read UTF-8; do not escape an entire deck by default.
 
 ### Step 2: Use in slide-XX.js
 

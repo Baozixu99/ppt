@@ -40,5 +40,19 @@
     "expectedMode": "full",
     "expectedNarrativeRoute": "general-business",
     "requiredChecks": ["sensitivity-review", "least-disclosure", "source-manifest", "render-qa"]
+  },
+  {
+    "id": "pdf-competition-defense",
+    "prompt": "根据附件中的 80 页项目结题 PDF 制作约 25 页比赛决赛答辩 PPT。高信息密度、学术浅色、突出量化成果、工程工作量和真机证据。",
+    "expectedMode": "high-stakes",
+    "expectedNarrativeRoute": "academic-systems",
+    "requiredChecks": ["document-ingestion", "deck-brief", "story-checkpoint", "visual-preview-checkpoint", "page-level-sources", "native-powerpoint-render", "notes-per-slide"]
+  },
+  {
+    "id": "renderer-conflict",
+    "prompt": "使用 pptx-generator 制作一份可复现的 PPT 工程，但当前宿主同时要求使用自己的 presentations runtime。",
+    "expectedMode": "full",
+    "expectedNarrativeRoute": "general",
+    "requiredChecks": ["single-renderer-selection", "host-adapter-decision", "renderer-neutral-contracts", "portable-paths"]
   }
 ]

@@ -4,11 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -44,6 +46,33 @@ def find_powerpoint() -> Path | None:
 def numeric_key(path: Path) -> tuple[int, str]:
     match = re.search(r"(\d+)(?=\.[^.]+$)", path.name)
     return (int(match.group(1)) if match else 10**9, path.name.lower())
+
+
+def write_manifest(output: Path, pptx: Path, engine: str, dpi: int, count: int) -> None:
+    manifest = {
+        "version": 1,
+        "pptx": pptx.name,
+        "engine": engine,
+        "dpi": dpi,
+        "slideCount": count,
+        "renderedAt": datetime.now(timezone.utc).isoformat(),
+    }
+    (output / "render-manifest.json").write_text(
+        json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+    )
+
+
+def validate_package(pptx: Path) -> None:
+    validator = Path(__file__).with_name("validate-pptx.py")
+    result = subprocess.run(
+        [sys.executable, str(validator), str(pptx)],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise SystemExit(f"PPTX package validation failed before rendering:\n{result.stdout}")
 
 
 def render_with_powerpoint(pptx: Path, output: Path, dpi: int, timeout_seconds: int) -> int:
@@ -170,6 +199,7 @@ def main() -> int:
     pptx = args.pptx.resolve()
     if not pptx.is_file() or pptx.suffix.lower() != ".pptx":
         parser.error(f"PPTX not found: {pptx}")
+    validate_package(pptx)
     output = (args.output_dir or pptx.with_name(f"{pptx.stem}-rendered")).resolve()
     output.mkdir(parents=True, exist_ok=True)
     for stale in output.glob("slide-*.png"):
@@ -184,6 +214,7 @@ def main() -> int:
             print(f"PowerPoint renderer unavailable: {error}", file=sys.stderr)
             count = 0
         if count:
+            write_manifest(output, pptx, "powerpoint", args.dpi, count)
             print(f"Rendered {count} slide(s) to {output} with PowerPoint")
             return 0
         if args.engine == "powerpoint":
@@ -215,6 +246,7 @@ def main() -> int:
         if not count:
             raise SystemExit("Install PyMuPDF, pypdfium2, or Poppler pdftoppm to render PDF pages.")
 
+    write_manifest(output, pptx, "libreoffice", args.dpi, count)
     print(f"Rendered {count} slide(s) to {output} with LibreOffice")
     return 0
 

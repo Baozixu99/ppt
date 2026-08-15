@@ -1,6 +1,8 @@
 const slideConfig = Object.freeze({
   type: 'cover',
-  title: 'PPTX Generator Smoke Test'
+  title: 'PPTX Generator Smoke Test',
+  visual: 'shape',
+  sources: ['starter-fixture']
 });
 
 function createSlide(pres, theme, helpers) {
@@ -20,6 +22,9 @@ function createSlide(pres, theme, helpers) {
     x: 1.2, y: 3.05, w: 7.6, h: 0.55,
     fontFace: helpers.FONTS.en, fontSize: 18,
     color: theme.secondary, align: 'center', margin: 0
+  });
+  helpers.addConnector(slide, pres, { x: 5.35, y: 3.9 }, { x: 4.65, y: 3.9 }, {
+    color: theme.light, width: 1.25, endArrowType: 'triangle'
   });
   helpers.addSources(slide, ['starter-fixture']);
   return slide;

@@ -19,9 +19,12 @@ Use this before planning a deck. Ask no more than three questions in one round, 
 | Visual style | No template or direction exists and the choice is material | A user template, brand guide, or reference slide is supplied |
 | Research | Claims must be current or sourced | All content is user-provided and no external verification is requested |
 
+Do not silently infer a high-impact item when it can change the narrative, pacing, template, or deliverable. For a formal defense, speaking time, mandatory organizer sections, required templates, and demo/video requirements are high impact. Record unresolved high-impact items and all assumptions in `deck-brief.json` using [brief-contract.md](brief-contract.md).
+
 ## Communication rules
 
 - Ask at most three concise questions in one message.
 - State reasonable assumptions and continue when risk is low.
+- For high-stakes work, confirm the story and three representative visuals unless the user explicitly waives those checkpoints.
 - Do not expose filenames, module names, npm commands, or internal planning vocabulary to the audience.
 - Resolve conflicts in this order: factual integrity, user template/brand, audience readability, narrative coherence, stylistic preference.

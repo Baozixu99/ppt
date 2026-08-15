@@ -1,6 +1,8 @@
 # Academic & Extended Patterns (Reference Library)
 
-This file holds **specialized layout & visual patterns** that don't fit the 5 core page types (Cover / TOC / Section Divider / Content / Summary) but recur across academic / dashboard / corporate-summary decks.
+This file holds optional specialized layouts that extend the seven core page types. Use a pattern only when the source structure and audience benefit from it; a domain match alone does not make the pattern mandatory.
+
+## Contents
 
 | # | Pattern | Origin | Reuse Trigger |
 |:-:|---------|--------|---------------|
@@ -16,7 +18,7 @@ Each pattern is **independent, parameterizable, content-agnostic**.
 
 ## Section Number Mapping Convention
 
-**Mandatory for any academic deck presenting a paper, thesis, or research report.**
+Use this convention for paper talks or thesis defenses when reviewers are expected to cross-reference stable numbered sections. Do not force it onto competition defenses, project reports, or sources without a useful section mapping.
 
 ### The rule
 
@@ -79,7 +81,7 @@ Section dividers use a **two-digit** format: `01`, `02`, `03`, `04`. These don't
 
 ### Mapping table (recommended for the deck)
 
-For decks with ≥ 15 content slides, include a "mapping table" slide near the front. Example:
+For long paper talks where cross-reference navigation is genuinely useful, a mapping table may be included near the front. It is not a default extra slide. Example:
 
 | Slide | Header | Paper section |
 |-------|--------|---------------|
@@ -91,7 +93,7 @@ This table itself becomes a navigation aid for the committee.
 
 ### Anti-patterns
 
-❌ **Don't** number slides arbitrarily (`01`, `02`, ... `25`) — academic decks must mirror paper structure
+❌ **Don't** claim that numbers mirror the source when they are only deck-local navigation
 ❌ **Don't** skip a section number even if you merged two subsections — use `1.3a` / `1.3b` if needed
 ❌ **Don't** show the paper's section *title* in the slide header — show only the number + your own subtitle (the slide title can differ from the paper's exact wording, but the number must match)
 ❌ **Don't** omit section numbers on "intro" slides — even the first content slide (4) should have `1.1`, not just a generic title
@@ -102,6 +104,8 @@ This table itself becomes a navigation aid for the committee.
 - See [domain-templates/academic-os-systems.md](domain-templates/academic-os-systems.md) for full paper-to-slide mapping example
 
 ---
+
+<a id="9-academic-header-pattern"></a>
 
 ## 9. Academic Header Pattern (编号 · Logo · Divider)
 
@@ -115,7 +119,7 @@ This table itself becomes a navigation aid for the committee.
 |:-:|---------|------|
 | 1 | **编号系统** | 左对齐大号蓝色文字（"3.2"），字号 ≈ 28pt，bold，与主标题**同行** |
 | 2 | **一级标题** | 紧随编号的中文短语（如 "研究内容2"），theme.primary 色，bold |
-| 3 | **主标题** | 破折号引导的中英文并列长标题（"——基于 FG-WRR 与闭环反馈的自适应 QoS 调度机制"），黑色加粗，字号 ≈ 24pt |
+| 3 | **主标题** | 破折号引导的中英文并列长标题（"——基于 FG-WRR 与闭环反馈的自适应 QoS 调度机制"），黑色加粗，字号 ≈ 30-35pt |
 | 4 | **校徽 Logo** | 右上角，**圆形校徽 + 中文校名 + 英文校名** 三行垂直版式，圆直径 ≈ 0.6" |
 | 5 | **Header 总高** | 占整页高度的 1/8（约 0.7"），与正文区分隔 |
 | 6 | **Divider** | Header 下方 0.05" 厚的横线（用 `pres.ShapeType.line`，height=0） |
@@ -143,10 +147,10 @@ This table itself becomes a navigation aid for the committee.
 | 编号（"3.2"） | Yes | 视觉锚点；字号必须 > 主标题字号 |
 | 一级标题 | Yes | 短中文短语（≤ 8 字），与编号同色 |
 | 主标题 | Yes | 破折号引导的长标题，可中英并列 |
-| 校徽 Logo | Yes | 右上角，圆形 + 中文 + 英文三行 |
+| 校徽 Logo | Optional | Use only when requested by the organizer, user, or institutional template |
 | Divider | Yes | theme.primary 色，width=2 |
 | Body content | Yes | Header 之外的科研正文 |
-| Page number badge | **MANDATORY** | 与其它 slide 一致 |
+| Page number badge | Recommended | Follow the selected deck template |
 
 ### Layout Code Skeleton
 
@@ -172,7 +176,7 @@ function createAcademicHeader(slide, pres, theme, opts) {
   // 3. 主标题（破折号引导）
   slide.addText(opts.mainTitle, {
     x: 0.5, y: HEADER_Y + HEADER_H, w: 8.0, h: HEADER_H,
-    fontSize: 24, bold: true, color: "000000",
+    fontSize: 32, bold: true, color: "000000",
     fontFace: "Microsoft YaHei", align: "left", valign: "middle"
   });
 
@@ -202,7 +206,7 @@ function createAcademicHeader(slide, pres, theme, opts) {
 
 - **编号字号 ≤ 主标题**：违反视觉层级——编号必须是 Header 中**最大**的字号
 - **省略 Divider**：让 Header 与正文混为一体，丢失学术风的"分隔感"
-- **校徽区域过小**：直径 < 0.5" 时远观无法识别，建议固定 0.6"
+- **校徽区域过小**：when a logo is used, keep it legible and preserve its aspect ratio
 - **混用中英文字体**：中文行用 `Microsoft YaHei`，英文行可改 Arial；不要全文统一 Arial
 - **把此 Header 简化为单一"大标题"**：它由 7 元素组成，不可降级为 Content slide 的 title
 - **变更编号格式破坏可复用性**：保持 `3.2` 形式（章节.子节），不要换成 `Module 3-2` 等自创格式
@@ -212,13 +216,15 @@ function createAcademicHeader(slide, pres, theme, opts) {
 满足以下全部条件时复用本 Pattern：
 - ✓ 汇报主体是科研/学术内容
 - ✓ 编号系统稳定（如 "3.1 / 3.2 / 3.3"）
-- ✓ Logo 是机构校徽（不是品牌 Logo）
+- ✓ A repeated institutional logo is required by the selected template or organizer
 - ✓ 主标题包含破折号引导的中英文并列
 - ✓ 整套 PPT 需统一 Header 风格（高度 / Divider / Logo 位置一致）
 
 仅一项满足时不建议使用——退回到 Content slide 的标准 title。
 
 ---
+
+<a id="10-top-kpi-strip"></a>
 
 ## 10. Top KPI Strip
 
@@ -259,6 +265,8 @@ function createAcademicHeader(slide, pres, theme, opts) {
 - ✓ Header 之后紧接详情页
 
 ---
+
+<a id="11-multi-card-9-grid-grouped"></a>
 
 ## 11. Multi-Card 9-Grid (Grouped)
 
@@ -310,6 +318,8 @@ function createAcademicHeader(slide, pres, theme, opts) {
 不适用的场景：模块描述超长（>60 字），改用 Timeline；模块数 < 6，改用 Icon + text rows。
 
 ---
+
+<a id="12-comparison--footer-banner"></a>
 
 ## 12. Comparison + Footer Banner (Cross-Case Summary)
 

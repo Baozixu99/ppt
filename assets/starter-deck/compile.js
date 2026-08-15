@@ -1,20 +1,52 @@
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 const PptxGenJS = require('pptxgenjs');
 const helpers = require('./_helpers');
+const theme = require('./_theme');
 
 const OUTPUT_DIR = path.join(__dirname, 'output');
-const FINAL_PATH = path.join(OUTPUT_DIR, 'presentation.pptx');
-const TEMP_PATH = path.join(OUTPUT_DIR, '.presentation.building.pptx');
-const BACKUP_PATH = path.join(OUTPUT_DIR, '.presentation.previous.pptx');
+let activeTempPath = path.join(OUTPUT_DIR, '.presentation.building.pptx');
 
-const theme = Object.freeze({
-  primary: '22223B',
-  secondary: '4A4E69',
-  accent: '9A8C98',
-  light: 'C9ADA7',
-  bg: 'F2E9E4'
-});
+function parseSlideSelection(value) {
+  if (!value) return null;
+  const numbers = new Set();
+  for (const token of value.split(',').map((item) => item.trim()).filter(Boolean)) {
+    const range = /^(\d+)-(\d+)$/.exec(token);
+    if (range) {
+      const start = Number(range[1]);
+      const end = Number(range[2]);
+      if (start < 1 || end < start) throw new Error(`Invalid slide range: ${token}`);
+      for (let number = start; number <= end; number += 1) numbers.add(number);
+      continue;
+    }
+    if (!/^\d+$/.test(token) || Number(token) < 1) throw new Error(`Invalid slide number: ${token}`);
+    numbers.add(Number(token));
+  }
+  if (!numbers.size) throw new Error('--slides requires at least one slide number.');
+  return numbers;
+}
+
+function parseArgs(argv) {
+  let output = path.join(OUTPUT_DIR, 'presentation.pptx');
+  let selection = null;
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--output') {
+      if (!argv[index + 1]) throw new Error('--output requires a path.');
+      output = path.resolve(process.cwd(), argv[index + 1]);
+      index += 1;
+    } else if (arg === '--slides') {
+      if (!argv[index + 1]) throw new Error('--slides requires a comma-separated list or range.');
+      selection = parseSlideSelection(argv[index + 1]);
+      index += 1;
+    } else {
+      throw new Error(`Unknown argument: ${arg}`);
+    }
+  }
+  if (path.extname(output).toLowerCase() !== '.pptx') throw new Error('--output must end in .pptx.');
+  return { output, selection };
+}
 
 function discoverSlides(dir) {
   return fs.readdirSync(dir)
@@ -31,20 +63,45 @@ function slideCount(pres) {
 }
 
 async function main() {
-  fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-  fs.rmSync(TEMP_PATH, { force: true });
-  if (!fs.existsSync(FINAL_PATH) && fs.existsSync(BACKUP_PATH)) fs.renameSync(BACKUP_PATH, FINAL_PATH);
-  else fs.rmSync(BACKUP_PATH, { force: true });
+  const args = parseArgs(process.argv.slice(2));
+  const finalPath = args.output;
+  const outputDir = path.dirname(finalPath);
+  const stem = path.basename(finalPath, '.pptx');
+  const tempPath = path.join(outputDir, `.${stem}.building.pptx`);
+  const backupPath = path.join(outputDir, `.${stem}.previous.pptx`);
+  activeTempPath = tempPath;
+  const contracts = spawnSync(process.execPath, [path.join(__dirname, 'validate-contracts.js')], {
+    cwd: __dirname,
+    encoding: 'utf8',
+    shell: false
+  });
+  if (contracts.stdout) process.stdout.write(contracts.stdout);
+  if (contracts.stderr) process.stderr.write(contracts.stderr);
+  if (contracts.status !== 0) throw new Error('Contract validation failed; build was not started.');
 
-  const slideFiles = discoverSlides(__dirname);
-  if (!slideFiles.length) throw new Error('No slide-NN.js modules were found.');
+  fs.mkdirSync(outputDir, { recursive: true });
+  fs.rmSync(tempPath, { force: true });
+  if (!fs.existsSync(finalPath) && fs.existsSync(backupPath)) fs.renameSync(backupPath, finalPath);
+  else fs.rmSync(backupPath, { force: true });
+
+  const allSlideFiles = discoverSlides(__dirname);
+  if (!allSlideFiles.length) throw new Error('No slide-NN.js modules were found.');
 
   const seenNumbers = new Set();
-  for (const item of slideFiles) {
+  for (const item of allSlideFiles) {
     if (seenNumbers.has(item.number)) {
       throw new Error(`Duplicate slide number ${item.number}: use one module per number.`);
     }
     seenNumbers.add(item.number);
+  }
+
+  const slideFiles = args.selection
+    ? allSlideFiles.filter((item) => args.selection.has(item.number))
+    : allSlideFiles;
+  if (args.selection) {
+    const found = new Set(slideFiles.map((item) => item.number));
+    const missing = [...args.selection].filter((number) => !found.has(number));
+    if (missing.length) throw new Error(`Selected slide module(s) not found: ${missing.join(', ')}`);
   }
 
   const pres = new PptxGenJS();
@@ -79,20 +136,20 @@ async function main() {
     process.stdout.write(`✓ ${String(number).padStart(2, '0')} ${file}\n`);
   }
 
-  await pres.writeFile({ fileName: TEMP_PATH, compression: true });
-  if (fs.existsSync(FINAL_PATH)) fs.renameSync(FINAL_PATH, BACKUP_PATH);
+  await pres.writeFile({ fileName: tempPath, compression: true });
+  if (fs.existsSync(finalPath)) fs.renameSync(finalPath, backupPath);
   try {
-    fs.renameSync(TEMP_PATH, FINAL_PATH);
-    fs.rmSync(BACKUP_PATH, { force: true });
+    fs.renameSync(tempPath, finalPath);
+    fs.rmSync(backupPath, { force: true });
   } catch (error) {
-    if (!fs.existsSync(FINAL_PATH) && fs.existsSync(BACKUP_PATH)) fs.renameSync(BACKUP_PATH, FINAL_PATH);
+    if (!fs.existsSync(finalPath) && fs.existsSync(backupPath)) fs.renameSync(backupPath, finalPath);
     throw error;
   }
-  process.stdout.write(`Built ${slideFiles.length} slides: ${FINAL_PATH}\n`);
+  process.stdout.write(`Built ${slideFiles.length} slides: ${finalPath}\n`);
 }
 
 main().catch((error) => {
-  fs.rmSync(TEMP_PATH, { force: true });
+  fs.rmSync(activeTempPath, { force: true });
   console.error(`Build failed: ${error.stack || error.message}`);
   process.exitCode = 1;
 });

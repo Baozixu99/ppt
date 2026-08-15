@@ -39,3 +39,5 @@ helpers.addSources(slide, ['revenue-q4']);
 ```
 
 Use `none` in STORY only when the slide makes no externally sourced claim and uses no sourced asset. Use `user` only when the supplied material itself is the source and no more specific manifest record is needed.
+
+For document-derived decks, prefer page- or section-specific user records over the generic `user` shorthand. Every final slide that declares a source in its module must contain its own `[Sources]` block in speaker notes. A source block on one slide does not satisfy another slide. The bundled QA resolves slide-to-notes relationships and checks this per slide.

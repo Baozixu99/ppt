@@ -2,6 +2,15 @@
 
 PptxGenJS supports 7 chart types. This file defines the **data conventions** for charts embedded in slide JS files.
 
+## Contents
+
+- [Choose inline data or `_data/`](#choose-inline-or-_data)
+- [When to use external JSON](#when-to-use-external-json)
+- [External JSON schema](#external-json-schema-when-needed)
+- [Chart type reference](#chart-type-reference)
+- [Common pitfalls](#common-pitfalls)
+- [Percentage and label contract](#percentage-and-label-contract)
+
 ## Choose Inline or `_data/`
 
 Use inline data for a small one-off chart that appears on only one slide. Use `slides/_data/` when data is user-provided, reused, large, transformed, or expected to change independently of layout.
@@ -93,3 +102,20 @@ For multi-series charts, `values` becomes an array of `{name, values, color}` ob
 - **Too many categories**: >10 bars/categories becomes unreadable — group smaller into "Others"
 - **No source attribution**: always include source for data charts (see inline pattern above)
 - **Stacked chart with 1 series**: appears empty — minimum 2 series for stacking
+
+## Percentage and label contract
+
+Treat percentages as typed data. Store one of these representations and document it beside the dataset:
+
+```javascript
+// Fraction representation: 0.6844 displays as 68.44% with a percent format.
+const tailReduction = { value: 0.6844, valueScale: 'fraction' };
+
+// Percentage-point representation: 68.44 displays as 68.44 and needs a literal % suffix.
+const tailReductionPoints = { value: 68.44, valueScale: 'percentage-point' };
+```
+
+- Never apply a percent number format to percentage-point values; PowerPoint will multiply the visible value by 100.
+- Explicitly configure `showValue`, `showCategoryName`, `showSeriesName`, and legends. Do not rely on renderer defaults.
+- After build, compare every visible chart label, total, axis, and annotation with the source data.
+- For high-stakes decks, inspect charts in a PowerPoint-native render when available.
