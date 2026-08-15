@@ -73,7 +73,7 @@ if (fs.existsSync(manifestPath)) {
   try {
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
     if (manifest.schemaVersion !== 1) failures.push('skill-manifest.json schemaVersion must be 1.');
-    if (manifest.name !== path.basename(root)) failures.push('skill-manifest.json name must match the Skill directory.');
+    if (manifest.name !== expectedSkillName) failures.push('skill-manifest.json name must match _skillhub_meta.json name.');
     if (manifest.entry !== 'SKILL.md' || !fs.existsSync(path.join(root, manifest.entry))) {
       failures.push('skill-manifest.json entry must point to SKILL.md.');
     }
